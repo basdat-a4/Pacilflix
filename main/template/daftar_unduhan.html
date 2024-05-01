@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Unduhan</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+</head>
+<body>
+    <h1>DAFTAR UNDUHAN (Pengguna)</h1>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalUnduhTayangan" tabindex="-1" aria-labelledby="modalUnduhTayanganLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalUnduhTayanganLabel">SUKSES MENAMBAHKAN TAYANGAN KE DAFTAR UNDUHAN</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Selamat! Anda telah berhasil mengunduh [Judul Tayangan] dan akan berlaku hingga [current time + 7 hari]. Cek informasi selengkapnya pada halaman daftar unduhan.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <a href="#daftar-unduhan" class="btn btn-primary">Menuju Daftar Unduhan</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daftar Unduhan -->
+    <div id="daftar-unduhan" class="mt-5">
+        <h2>Daftar Unduhan</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Judul</th>
+                    <th scope="col">Waktu Diunduh</th>
+                    <th scope="col">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tabel-daftar-unduhan">
+                <!-- Data daftar unduhan ditambahkan dengan JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-center mt-3">
+        <button type="button" class="btn btn-primary" id="unduh-tayangan-btn" data-bs-toggle="modal" data-bs-target="#modalUnduhTayangan">
+            Dummy Unduh Tayangan
+        </button>
+    </div>
+
+    <script>
+        document.getElementById("unduh-tayangan-btn").addEventListener("click", function() {
+            // Membuat baris baru untuk tabel daftar unduhan
+            let newRow = document.createElement("tr");
+
+            newRow.innerHTML = `
+                <td>Judul Tayangan</td>
+                <td>${new Date().toLocaleString()}</td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm hapus-data">Hapus</button>
+                </td>
+            `;
+
+            // Memasukkan baris baru ke dalam tabel
+            document.getElementById("tabel-daftar-unduhan").appendChild(newRow);
+
+            // Menambahkan event listener pada tombol hapus yang baru saja ditambahkan
+            newRow.querySelector(".hapus-data").addEventListener("click", function() {
+                hapusData(newRow);
+            });
+        });
+
+        // Fungsi menghapus baris tabel
+        function hapusData(row) {
+            row.remove();
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
