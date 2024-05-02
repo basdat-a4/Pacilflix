@@ -2,4 +2,4 @@ from django.shortcuts import render
 
 # Create your views here.
 def show_main(request):
-    return render(request, "episode.html")
+    return render(request, "mainmenu.html")
