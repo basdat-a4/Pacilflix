@@ -1,10 +1,11 @@
 {% extends 'base.html' %} 
 {% block content %}
-<div class="container d-flex flex-column justify-content-center align-items-center h-screen">
+{% include "navbar-guest.html" %}
+<div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 80vh; padding-top: 10vh;">
     <h1 class="text-center">Login</h1>
-    <div class="row mt-4 w-form">
-        <div class="d-flex flex-column gap-4">
-            <form method="post">
+    <div class="w-form" style="width: 100%; max-width: 500px;"> <!-- Set a max width for the form -->
+        <div class="card p-4 shadow"> <!-- Added card styling for better visual separation -->
+            <form method="post" class="d-flex flex-column gap-3">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
@@ -14,18 +15,10 @@
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-center">
                     <button type="submit" class="btn btn-primary">Login</button>
-                    <a class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
-            {% if messages %}
-            <div class="alert alert-danger">
-                {% for message in messages %}
-                <p>{{ message }}</p>
-                {% endfor %}
-            </div>
-            {% endif %}
         </div>
     </div>
 </div>

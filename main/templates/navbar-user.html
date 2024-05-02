@@ -1,20 +1,11 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	<div class="container-fluid mx-4">
-		{% if username == 'Guest' %}
 		<a class="navbar-brand" href="">Pacilflix</a>
-		{% else %}
-		<a class="navbar-brand" href="">Pacilflix</a>
-		{% endif %}
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<ul class="navbar-nav ms-auto">
-				{% if username == 'Guest' %}
-				<li class="nav-item">
-					<a class="nav-link" href="">Shows</a>
-				</li>
-				{% else %}
 				<li class="nav-item">
 					<a class="nav-link" href="">Shows</a>
 				</li>
@@ -22,10 +13,10 @@
 					<a class="nav-link" href="">Contributors</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="">Downloads</a>
+					<a class="nav-link" href="">Favorites</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="">Favorites</a>
+					<a class="nav-link" href="">Downloads</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="">Subscriptions</a>
@@ -38,7 +29,6 @@
 						<li><a class="dropdown-item" href="">Logout</a></li>
 					</ul>
 				</li>
-				{% endif %}
 			</ul>
 		</div>
 	</div>
