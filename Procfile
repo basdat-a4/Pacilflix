@@ -1,1 +1,1 @@
-web: gunicorn pacilflix.wsgi
+web: gunicorn Pacilflix.wsgi
