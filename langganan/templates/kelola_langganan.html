@@ -36,12 +36,12 @@
             <th>Tanggal Akhir</th>
         </tr>
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{{nama}}</td>
+            <td>{{harga}}</td>
+            <td>{{resolusi}}</td>
+            <td>{{perangkat}}</td>
+            <td>{{mulai}}</td>
+            <td>{{akhir}}</td>
         </tr>
     </table>
     <h2>Pilih Paket Lain:</h2>
@@ -53,27 +53,21 @@
           <th>Dukungan Perangkat</th>
           <th>Beli</th>
         </tr>
+        {% for row in paket %}
         <tr>
-            <td>Premium</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><button type="button" class="btn btn-secondary">Beli</button></td>
+            <td>{{row.0}}</td>
+            <td>{{row.1}}</td>
+            <td>{{row.2}}</td>
+            <td>{{row.3}}</td>
+            <td>        
+              <a href="{% url 'langganan:show_beli' row.0 %}">
+                <button type="button" class="btn btn-secondary">
+                    Beli
+                </button>
+              </a>
+            </td>
         </tr>
-        <tr>
-            <td>Standar</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><button type="button" class="btn btn-secondary">Beli</button></td>
-        </tr>
-        <tr>
-            <td>Basic</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><button type="button" class="btn btn-secondary">Beli</button></td>
-        </tr>
+        {% endfor %}
     </table>
     <h2 class="mt-5">Riwayat Transaksi</h2>
     <table class="table table-bordered mt-3">
@@ -85,14 +79,16 @@
             <th>Tanggal Pembayaran</th>
             <th>Total Pembayaran</th>
         </tr>
+        {% for row in transaksi %}
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>    
+            <td>{{row.0}}</td>
+            <td>{{row.1}}</td>
+            <td>{{row.2}}</td>
+            <td>{{row.3}}</td>
+            <td>{{row.4}}</td>
+            <td>{{row.5}}</td>    
         </tr>
+        {% endfor %}
     </table>
   </div>
 

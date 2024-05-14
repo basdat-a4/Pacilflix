@@ -32,22 +32,26 @@
                 <th>Dukungan Perangkat</th>
             </tr>
             <tr>
-              <td>Premium</td>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td>{{paket.0}}</td>
+              <td>{{paket.1}}</td>
+              <td>{{paket.2}}</td>
+              <td>{{paket.3}}</td>
             </tr>
         </table>
         <h2 class="text-center">Pilih Metode Pembayaran: </h2>
-        <select class="form-select text-center" aria-label="Default select example">
-          <option selected value="">Transfer Bank</option>
-          <option value="">Kartu Kredit</option>
-          <option value="">E-Wallet</option>
-        </select>
-        
-        <div class="mt-5">
-            <button type="button" class="btn btn-secondary mt-3 full-button">Bayar</button>
-        </div>
+        <form method="POST" >  
+          {% csrf_token %}
+          <select class="form-select text-center" aria-label="Default select example" name="pay">
+            <option selected value="Transfer Bank">Transfer Bank</option>
+            <option value="Kartu Kredit">Kartu Kredit</option>
+            <option value="E-Wallet">E-Wallet</option>
+          </select>
+          <div class="mt-5">
+              <button type="submit" class="btn btn-secondary">
+                  Beli
+              </button>
+          </div>
+        </form>
     </div>
   </div>
 </body>
