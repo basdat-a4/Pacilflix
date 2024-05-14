@@ -1,0 +1,52 @@
+{% extends 'base.html' %} 
+{% block meta %}
+  <style>
+    .table-bordered {
+      border: 1px solid #000000;
+    }
+    .table-bordered th,
+    .table-bordered td {
+      border: 1px solid #000000;
+    }
+
+    th {
+        background-color: #808080;
+    }
+  </style>
+{% endblock meta %}
+
+{% block content %}
+<body>
+  {% include "navbar-user.html" %}
+  <div class="container mt-5">
+    <h1>DAFTAR KONTRIBUTOR</h1>
+    <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Filter berdasarkan tipe:
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{% url 'contributor:show_contributors' %}">Semua</a></li>
+        <li><a class="dropdown-item" href="{% url 'contributor:show_sutradara' %}">Sutradara</a></li>
+        <li><a class="dropdown-item" href="{% url 'contributor:show_pemain' %}">Pemain</a></li>
+        <li><a class="dropdown-item" href="{% url 'contributor:show_penulis' %}">Penulis Skenario</a></li>
+      </ul>
+    </div>
+    <table class="table table-bordered mt-4">
+        <tr class="table-secondary">
+          <th scope="col">Nama</th>
+          <th scope="col">Tipe</th>
+          <th scope="col">Jenis Kelamin</th>
+          <th scope="col">Kewarganegaraan</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+          <td>{{row.0}}</td>
+          <td>{{row.1}}</td>
+          <td>{{row.2}}</td>
+          <td>{{row.3}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+  </div>
+</body>
+{% endblock content %}

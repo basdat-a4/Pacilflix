@@ -18,8 +18,8 @@
                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
                         <h1 class="card-title">PacilFlix - A4</h1>
                         <div class="mt-4 w-100">
-                            <a href="login.html" class="btn btn-primary w-100 mb-2">Login</a>
-                            <a href="register.html" class="btn btn-primary w-100">Register</a>
+                            <a href="{% url 'authentication:show_login' %}" class="btn btn-primary w-100 mb-2">Login</a>
+                            <a href="{% url 'authentication:show_register' %}" class="btn btn-primary w-100">Register</a>
                         </div>
                     </div>
                 </div>

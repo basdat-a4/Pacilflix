@@ -7,19 +7,19 @@
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item">
-					<a class="nav-link" href="">Shows</a>
+					<a class="nav-link" href="{% url 'tayangan:show_tayangan' %}">Shows</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="">Contributors</a>
+					<a class="nav-link" href="{% url 'contributor:show_contributors' %}">Contributors</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="">Favorites</a>
+					<a class="nav-link" href="{% url 'save:daftar_favorit' %}">Favorites</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="">Downloads</a>
+					<a class="nav-link" href="{% url 'save:daftar_unduhan' %}">Downloads</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="">Subscriptions</a>
+					<a class="nav-link" href="{% url 'langganan:show_langganan' %}">Subscriptions</a>
 				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
