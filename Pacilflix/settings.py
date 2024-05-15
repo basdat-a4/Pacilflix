@@ -27,13 +27,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = 'django-insecure-lfjfmnjw7d-u7d801m-*&1n96ruo0=wd(tf%2hcxhk!98_m&bu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if ENVIRONMENT == 'development':
     DEBUG = True
 else:
-    DEBUG = False
+    DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -92,11 +92,11 @@ WSGI_APPLICATION = 'Pacilflix.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env("DB_PORT"),
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD':'JRxaeqVwRJKFCUFdFGtKVjVqaVlrhtvE',
+        'HOST': 'monorail.proxy.rlwy.net',
+        'PORT': '20465',
     }
 }
 

@@ -1,4 +1,3 @@
-import datetime
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -6,10 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import redirect
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages  
-from django.contrib.auth import authenticate, login
-from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import redirect
@@ -25,19 +21,22 @@ def show_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        cursor.execute("SET search_path TO pacilflix;")
-        cursor.execute(f"SELECT * FROM PENGGUNA P WHERE P.username = '{username}' AND P.password = '{password}'")
-        users = cursor.fetchmany()
-        print(users)
-        if len(users) > 0:
-            request.session['username'] = username
-            response = HttpResponseRedirect(reverse("base:log")) 
-            response.set_cookie('last_login', str(datetime.datetime.now()))
-            return response
+
+        with connection.cursor() as cursor:
+            cursor.execute("SET search_path TO pacilflix;")
+            cursor.execute("SELECT * FROM PENGGUNA WHERE username = %s AND password = %s", [username, password])
+            user = cursor.fetchone()
+
+        if user:
+            # context = {
+            #     'username': username,
+            # }
+            return redirect('tayangan:show_tayangan')
         else:
-            messages.info(request, 'Sorry, incorrect username or password. Please try again.')
-    context = {}
-    return render(request, 'login.html', context)
+            messages.error(request, 'Sorry, incorrect username or password. Please try again.')
+            return render(request, 'login.html')
+
+    return render(request, 'login.html')
 
 def show_register(request):
     if request.method == "POST":
@@ -69,4 +68,4 @@ def show_register(request):
 
 def logout_user(request):
     request.session.flush()
-    return HttpResponseRedirect(reverse('authentication:mainmenu.html'))
+    return redirect('authentication:show_main')

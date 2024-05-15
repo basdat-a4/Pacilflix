@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	<div class="container-fluid mx-4">
-		<a class="navbar-brand" href="">Pacilflix</a>
+		<a class="navbar-brand" href="tayangan:show_tayangan">Pacilflix</a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
@@ -26,7 +26,7 @@
 						{{username}}
 					</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<li><a class="dropdown-item" href="">Logout</a></li>
+						<li><a class="dropdown-item" href="{% url 'authentication:logout' %}">Logout</a></li>
 					</ul>
 				</li>
 			</ul>
