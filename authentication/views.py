@@ -28,15 +28,15 @@ def show_login(request):
             user = cursor.fetchone()
 
         if user:
-            # context = {
-            #     'username': username,
-            # }
-            return redirect('tayangan:show_tayangan')
+            response = redirect('tayangan:show_tayangan')  # Redirect to the desired page after login
+            response.set_cookie('username', username, max_age=86400)  # Set cookie to store username with 1 day expiration
+            return response
         else:
             messages.error(request, 'Sorry, incorrect username or password. Please try again.')
             return render(request, 'login.html')
 
     return render(request, 'login.html')
+
 
 def show_register(request):
     if request.method == "POST":
@@ -53,11 +53,6 @@ def show_register(request):
             # Jika username sudah ada
             if len(users) > 0:
                 messages.error(request, "Username yang Anda gunakan sudah tersedia.")
-                return render(request, 'register.html', {'form': request.POST})
-
-            # Cek kekuatan password
-            if len(password) < 8:
-                messages.error(request, "Password minimal harus 8 karakter.")
                 return render(request, 'register.html', {'form': request.POST})
 
             # Jika semua validasi terpenuhi
