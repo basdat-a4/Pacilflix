@@ -62,5 +62,7 @@ def show_register(request):
     return render(request, 'register.html')
 
 def logout_user(request):
+    response = redirect('authentication:show_main')  # Redirect to the main menu
+    response.delete_cookie('username')  # Delete the 'username' cookie
     request.session.flush()
-    return redirect('authentication:show_main')
+    return response
