@@ -27,9 +27,9 @@ def show_login(request):
         cursor.execute(f"SELECT * FROM PENGGUNA P WHERE P.username = '{username}' AND P.password = '{password}'")
         users = cursor.fetchone()
 
-        if len(users) > 0:
+        if users is not None:
             request.session['username'] = users[0]
-            response = HttpResponseRedirect(reverse("tayangan:show_tayangan")) 
+            response = redirect('tayangan:show_tayangan')
             response.set_cookie('username', users[0])
             response.set_cookie('last_login', str(datetime.datetime.now()))
             return response
@@ -46,17 +46,14 @@ def show_register(request):
 
         cursor.execute("SET search_path TO pacilflix;")
         cursor.execute("SELECT * FROM PENGGUNA WHERE username = %s", [username])
-        users = cursor.fetchmany()
-
-        # Jika username sudah ada
-        if len(users) > 0:
-            messages.error(request, "Username yang Anda gunakan sudah tersedia.")
+        if cursor.fetchone() is not None:
+            messages.error(request, f"Username {username} sudah tersedia.")
             return render(request, 'register.html', {'form': request.POST})
 
-        # Jika semua validasi terpenuhi
         cursor.execute("INSERT INTO pengguna (username, password, negara_asal) VALUES (%s, %s, %s)", [username, password, negara])
         messages.success(request, 'Your account has been successfully created!')
         return redirect('authentication:show_login')
+
     return render(request, 'register.html')
 
 def logout_user(request):

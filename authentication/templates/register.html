@@ -3,8 +3,8 @@
 {% include "navbar-guest.html" %}
 <div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 80vh; padding-top: 10vh;">
     <h1 class="text-center">Register</h1>
-    <div class="w-form" style="width: 100%; max-width: 500px;"> <!-- Set a max width for the form -->
-        <div class="card p-4 shadow"> <!-- Added card styling for better visual separation -->
+    <div class="w-form" style="width: 100%; max-width: 500px;">
+        <div class="card p-4 shadow">
             <form method="post" class="d-flex flex-column gap-3">
                 {% csrf_token %}
                 <div class="mb-3">
