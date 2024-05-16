@@ -16,20 +16,17 @@
         </div>
 
         <!-- Opsi Top 10 -->
-        <div class="mb-3">
-            <button type="button" class="btn btn-primary me-2">Top 10 Global (default)</button>
-            <button type="button" class="btn btn-primary">Top 10 Negara Pengguna</button>
-        </div>
+        <h2>TOP 10 GLOBAL TAYANGAN MINGGU INI</h2>
 
         <!-- Tabel Tayangan Terbaik -->
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>Peringkat</th>
                     <th>Judul</th>
-                    <th>Sinopsis</th>
-                    <th>Trailer</th>
-                    <th>Tanggal Rilis</th>
+                    <th>Sinopsis Trailer</th>
+                    <th>URL Trailer</th>
+                    <th>Tanggal Rilis Trailer</th>
                     <th>Total View 7 Hari Terakhir</th>
                     <th>Tayangan</th>
                 </tr>
@@ -45,7 +42,6 @@
                     <td><data></td>
                     <td><button type="button" class="btn btn-primary">Halaman Tayangan</button></td>
                 </tr>
-                <!-- ⋮ Other rows ⋮ -->
             </tbody>
         </table>
 
@@ -56,23 +52,27 @@
             <thead>
                 <tr>
                     <th>Judul</th>
-                    <th>Sinopsis</th>
-                    <th>Trailer</th>
-                    <th>Tanggal Rilis</th>
+                    <th>Sinopsis Trailer</th>
+                    <th>URL Trailer</th>
+                    <th>Tanggal Rilis Trailer</th>
                     <th>Tayangan</th>
                 </tr>
             </thead>
+            {% for row in rowsFilm %}
             <tbody>
-                <!-- Data film -->
                 <tr>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><button type="button" class="btn btn-primary">Halaman Tayangan</button></td>
+                    <td>{{row.0}}</td>
+                    <td>{{row.1}}</td>
+                    <td>{{row.2}}</td>
+                    <td>{{row.3}}</td>
+                    <td>
+                    {% if paketAktif %}
+                        <a href="{% url 'tayangan:show_film' row.4 %}"><button type="button" class="btn btn-primary">Halaman Tayangan</button></a>
+                    {% endif %}
+                    </td>
                 </tr>
-                <!-- ⋮ Other rows ⋮ -->
             </tbody>
+            {% endfor %}
         </table>
 
         <!-- Kategori: Series -->
@@ -82,23 +82,27 @@
             <thead>
                 <tr>
                     <th>Judul</th>
-                    <th>Sinopsis</th>
-                    <th>Trailer</th>
-                    <th>Tanggal Rilis</th>
+                    <th>Sinopsis Trailer</th>
+                    <th>URL Trailer</th>
+                    <th>Tanggal Rilis Trailer</th>
                     <th>Tayangan</th>
                 </tr>
             </thead>
+            {% for row in rowsSeries %}
             <tbody>
-                <!-- Data series -->
                 <tr>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><button type="button" class="btn btn-primary">Halaman Tayangan</button></td>
+                    <td>{{row.0}}</td>
+                    <td>{{row.1}}</td>
+                    <td>{{row.2}}</td>
+                    <td>{{row.3}}</td>
+                    <td>
+                    {% if paketAktif %}
+                        <a href="{% url 'tayangan:show_series' row.4 %}"><button type="button" class="btn btn-primary">Halaman Tayangan</button></a></td>
+                    {% endif %}
+                    </td>
                 </tr>
-                <!-- ⋮ Other rows ⋮ -->
             </tbody>
+            {% endfor %}
         </table>
     </div>
 
