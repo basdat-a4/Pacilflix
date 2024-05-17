@@ -1,20 +1,17 @@
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.shortcuts import render, redirect
 from django.shortcuts import redirect
 from django.contrib import messages  
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.shortcuts import redirect
 from django.db import connection
-from django.contrib.auth import logout
 import datetime
 
-# Create your views here.
 cursor = connection.cursor()
+
+def login_required_custom(view_func):
+    def _wrapped_view_func(request, *args, **kwargs):
+        if 'username' not in request.COOKIES:
+            return redirect('/')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view_func
 
 def show_main(request):
     return render(request, "mainmenu.html")
