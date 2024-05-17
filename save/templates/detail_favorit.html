@@ -2,29 +2,27 @@
 {% block content %}
 
 {% include "navbar-user.html" %}
-<h1>Detail Daftar Favorit</h1>
-
-<h2>Daftar Favorit {{ favorit_id }}</h2>
-{% if tayangan_list %}
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Judul Tayangan</th>
-            <th scope="col">Aksi</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for tayangan in tayangan_list %}
-        <tr>
-            <td>{{ tayangan.0 }}</td>
-            <td><button type="button" class="btn btn-danger btn-sm hapus-data"
-                    onclick="hapusTayangan('{{ tayangan.1 }}, {{ favorit_id }}')">Hapus</button>
-                
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container mt-4">
+    <h1 class="text-center fw-bold">Detail Daftar Favorit</h1>
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th scope="col">Judul Tayangan</th>
+                <th scope="col">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for judul in tayangan_list %}
+            <tr>
+                <td>{{ judul }}</td>
+                <td><button type="button" class="btn btn-danger btn-sm hapus-data"
+                        onclick="hapusTayangan('{{ tayangan.1 }}, {{ favorit_id }}')">Hapus</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
 <p>Tidak ada tayangan dalam daftar favorit ini.</p>
 {% endif %}

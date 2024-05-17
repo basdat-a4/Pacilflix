@@ -11,9 +11,11 @@ def daftar_unduhan(request):
                             JOIN TAYANGAN_TERUNDUH TT ON T.id = TT.id_tayangan;
                             """, [username])
             unduhan_list = cursor.fetchall()
-            print(unduhan_list)
-        return render(request, 'daftar_unduhan.html', {'unduhan_list': unduhan_list})
-
+            context = {
+                'username': username,
+                'unduhan_list': unduhan_list,
+            }
+        return render(request, 'daftar_unduhan.html', context)
 
 def daftar_favorit(request):
         username = request.COOKIES["username"]
@@ -25,6 +27,10 @@ def daftar_favorit(request):
                 WHERE username = %s
                 """, [username])
             favorit_list = cursor.fetchall()
+            context = {
+                'username': username,
+                'favorit_list': favorit_list,
+            }
         return render(request, 'daftar_favorit.html', {'favorit_list': favorit_list})
     
 
@@ -42,15 +48,14 @@ def detail_favorit(request, favorit_id):
         return render(request, 'detail_favorit.html', {'tayangan_list': tayangan_list, 'favorit_id': favorit_id, 'user': request.user})
     
 
-# def hapus_favorit(request, favorit_id):
-#         username = request.COOKIES["username"]
-#         try:
-#             with connection.cursor() as cursor:
-#                 cursor.execute("""
-#                     DELETE FROM DAFTAR_FAVORIT
-#                     WHERE id_favorit = %s AND username = %s
-#                 """, [favorit_id, username])
-#             return JsonResponse({'success': True})
-#         except Exception as e:
-#             return JsonResponse({'success': False, 'message': str(e)})
-
+def delete_unduhan(request):
+    if request.method == 'POST':
+        id_tayangan = request.POST.get('id_tayangan')
+        username = request.COOKIES.get('username')
+        with connection.cursor() as cursor:
+            cursor.execute("SET search_path TO Pacilflix;")
+            cursor.execute("""DELETE FROM TAYANGAN_TERUNDUH
+                           WHERE id_tayangan = %s
+                           AND username = %s""", [id_tayangan, username])
+        # Setelah berhasil, arahkan kembali ke halaman daftar unduhan
+        return redirect('save:detail_favorit')

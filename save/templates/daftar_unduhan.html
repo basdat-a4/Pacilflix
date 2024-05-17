@@ -2,27 +2,39 @@
 {% block content %}
 
 {% include "navbar-user.html" %}
-<h1>DAFTAR UNDUHAN (Pengguna)</h1>
 
-<!-- Modal Unduh Tayangan-->
-<div class="modal fade" id="modalUnduhTayangan" tabindex="-1" aria-labelledby="modalUnduhTayanganLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalUnduhTayanganLabel">SUKSES MENAMBAHKAN TAYANGAN KE DAFTAR UNDUHAN
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Selamat! Anda telah berhasil mengunduh [Judul Tayangan] dan akan berlaku hingga [current time + 7
-                    hari]. Cek informasi selengkapnya pada halaman daftar unduhan.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                <a href="#daftar-unduhan" class="btn btn-primary">Menuju Daftar Unduhan</a>
-            </div>
-        </div>
+<!-- Daftar Unduhan -->
+<div class="container mt-4">
+    <h1 class="text-center fw-bold">DAFTAR UNDUHAN</h1>
+    <div id="daftar-unduhan" class="mt-5">
+        {% if error_message %}
+        <p>Error: {{ error_message }}</p>
+        {% endif %}
+        {% if unduhan_list %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Judul</th>
+                    <th scope="col">Waktu Diunduh</th>
+                    <th scope="col">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tabel-daftar-unduhan">
+                {% for unduhan in unduhan_list %}
+                <tr>
+                    <td>{{ unduhan.0 }}</td>
+                    <td>{{ unduhan.1 }}</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm hapus-data">Hapus</button>
+                        <span class="status-hapus" style="margin-left: 5px;"></span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Tidak ada unduhan tersedia.</p>
+        {% endif %}
     </div>
 </div>
 
@@ -45,60 +57,23 @@
 </div>
 
 <!-- Toast Berhasil Hapus -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="toastBerhasilHapus" class="toast align-items-center text-bg-success border-0" role="alert"
-        aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body">
-                Berhasil dihapus
+<div class="modal fade" id="modalBerhasilHapus" tabindex="-1" aria-labelledby="modalBerhasilHapusLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalBerhasilHapusLabel">BERHASIL MENGHAPUS TAYANGAN</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                aria-label="Close"></button>
+            <div class="modal-body">
+                <p>Tayangan berhasil dihapus.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
         </div>
     </div>
 </div>
-
-<!-- Daftar Unduhan -->
-<div id="daftar-unduhan" class="mt-5">
-    <h2>Daftar Unduhan</h2>
-    {% if error_message %}
-        <p>Error: {{ error_message }}</p>
-    {% endif %}
-        {% if unduhan_list %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Judul</th>
-                        <th scope="col">Waktu Diunduh</th>
-                        <th scope="col">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tabel-daftar-unduhan">
-                    {% for unduhan in unduhan_list %}
-                    <tr data-id-tayangan="{{ unduhan.0 }}" data-username="{{ unduhan.1 }}" data-timestamp="{{ unduhan.3 }}">
-                        <td>{{ unduhan.2 }}</td>
-                        <td>{{ unduhan.3 }}</td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-sm hapus-data">Hapus</button>
-                            <span class="status-hapus" style="margin-left: 5px;"></span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>Tidak ada unduhan tersedia.</p>
-        {% endif %}
-</div>
-
-<!-- Tombol Unduh Tayangan -->
-<div class="text-center mt-3">
-    <button type="button" class="btn btn-primary" id="unduh-tayangan-btn" data-bs-toggle="modal"
-        data-bs-target="#modalUnduhTayangan">
-        Dummy Unduh Tayangan
-    </button>
-</div>
-
 
 <script>
     document.querySelectorAll(".hapus-data").forEach(button => {
@@ -106,14 +81,6 @@
             hapusData(button.closest("tr"));
         });
     });
-
-    // // Tombol Uji Coba Hapus
-    // document.getElementById("uji-coba-hapus-btn").addEventListener("click", function () {
-    //     let testRow = document.querySelector("tr[data-id-tayangan]");
-    //     if (testRow) {
-    //         hapusData(testRow);
-    //     }
-    // });
 
     // Fungsi hapus row tabel
     function hapusData(row) {
@@ -129,7 +96,7 @@
         let diffDays = diffTime / (1000 * 3600 * 24);
 
         if (diffDays < 1) {
-            // Jika belum 1 hari
+            // Jika belum 1 hari, tampilkan modal gagal
             var modal = new bootstrap.Modal(document.getElementById('modalGagalHapus'));
             modal.show();
             return;
@@ -142,24 +109,24 @@
             .then(response => {
                 // Periksa status respon
                 if (response.ok) {
-                    // Jika penghapusan berhasil, muncul pesan
-                    let toastEl = document.getElementById('toastBerhasilHapus');
-                    let toast = new bootstrap.Toast(toastEl);
-                    toast.show();
-
                     // Setelah beberapa detik, row dihapus
                     setTimeout(() => {
                         row.remove();
+                        // Jika penghapusan berhasil, tampilkan modal sukses
+                        var modal = new bootstrap.Modal(document.getElementById('modalBerhasilHapus'));
+                        modal.show();
                     }, 3000);
                 } else {
-                    // Jika penghapusan gagal, muncul pesan
-                    row.querySelector(".status-hapus").textContent = "Gagal dihapus";
+                    // Jika penghapusan gagal, muncul pesan gagal di modal
+                    var modal = new bootstrap.Modal(document.getElementById('modalGagalHapus'));
+                    modal.show();
                 }
             })
             .catch(error => {
-                // Jika error, muncul pesan
+                // Jika error, muncul pesan gagal di modal
+                var modal = new bootstrap.Modal(document.getElementById('modalGagalHapus'));
+                modal.show();
                 console.error("Error:", error);
-                row.querySelector(".status-hapus").textContent = "Gagal dihapus";
             });
     }
 </script>

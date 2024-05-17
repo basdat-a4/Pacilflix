@@ -2,10 +2,9 @@
 {% block content %}
 
 {% include "navbar-user.html" %}
-<h1>Daftar Favorit</h1>
 
 <!-- Modal Tambah Favorit -->
-<div class="modal fade" id="modalTambahFavorit" tabindex="-1" aria-labelledby="modalTambahFavoritLabel"
+<!-- <div class="modal fade" id="modalTambahFavorit" tabindex="-1" aria-labelledby="modalTambahFavoritLabel"
     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -13,11 +12,11 @@
                 <h5 class="modal-title" id="modalTambahFavoritLabel">TAMBAH KE DAFTAR FAVORIT</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <!-- Form memilih daftar favorit -->
-                <label for="dropdownDaftarFavorit" class="form-label">Judul Daftar Favorit:</label>
+            <div class="modal-body"> -->
+
+<!-- Form memilih daftar favorit -->
+<!-- <label for="dropdownDaftarFavorit" class="form-label">Judul Daftar Favorit:</label>
                 <select class="form-select" aria-label="Daftar Favorit" id="dropdownDaftarFavorit">
-                    <!-- Option daftar favorit -->
                     <option value="1">Judul Favorit 1</option>
                     <option value="2">Judul Favorit 2</option>
                 </select>
@@ -28,36 +27,39 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Tabel Daftar Favorit -->
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Judul</th>
-            <th scope="col">Waktu Ditambahkan</th>
-            <th scope="col">Aksi</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for favorit in favorit_list %}
-        <tr>
-            <td><a href="{% url 'detail_favorit' favorit.0 %}">{{ favorit.1 }}</a></td>
-            <td>{{ favorit.2 }}</td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm hapus-data"
-                    onclick="hapusFavorit('{{ favorit.0 }}')">Hapus</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container mt-4">
+    <h1 class="text-center fw-bold">Daftar Favorit</h1>
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th scope="col">Judul</th>
+                <th scope="col">Waktu Ditambahkan</th>
+                <th scope="col">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for judul, timestamp in favorit_list %}
+            <tr>
+                <td><a href="{% url 'save:daftar_favorit' %}">{{ judul }}</a></td>
+                <td>{{ timestamp }}</td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm hapus-data"
+                        onclick="hapusFavorit('{{ favorit.0 }}')">Hapus</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-<div class="fav-tayangan">
+<!-- <div class="fav-tayangan">
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahFavorit">
         Tambah
     </button>
-</div>
+</div> -->
 
 <script>
     function hapusFavorit(favoritId) {
