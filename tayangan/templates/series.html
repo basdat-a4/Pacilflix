@@ -10,15 +10,15 @@
         <h1>HALAMAN SERIES</h1>
 
         <!-- Judul Series -->
-        <h2>Judul: <data></h2>
+        <h2>Judul: {{ dataSeries.1 }}</h2>
 
         <!-- Daftar Episode -->
         <h3>Episode:</h3>
-        <ul>
-            <li><a href="#">Episode 1</a></li>
-            <!-- ⋮ Other episodes ⋮ -->
-            <li><a href="#">Episode N</a></li>
-        </ul>
+        {% for row in episode %}
+            <ul>
+                <li><a href="{% url 'tayangan:show_episode' id row.1 %}">{{ row.0 }}</a></li>
+            </ul>
+        {% endfor %}
 
         <!-- Tombol Aksi -->
         <div class="mb-3">
@@ -28,29 +28,29 @@
 
         <!-- Informasi Series -->
         <div class="mb-3">
-            <p>Total View: <data></p>
-            <p>Rating Rata-Rata: <data></p>
-            <p>Sinopsis: <data></p>
+            <p>Total View: NOT YET</p>
+            <p>Rating Rata-Rata: {{ avgRating.0 }} / 5.0</p>
+            <p>Sinopsis: {{ dataSeries.1 }}</p>
             <p>Genre:</p>
+            {% for row in genre %}
             <ul>
-                <li><data_genre_1></li>
-                <!-- ⋮ Other genres ⋮ -->
-                <li><data_genre_n></li>
+                <li>{{ row.0 }}</li>
             </ul>
-            <p>Asal Negara: <data></p>
+            {% endfor %}
+            <p>Asal Negara: {{ dataFilm.6 }}</p>
             <p>Pemain:</p>
+            {% for row in pemain %}
             <ul>
-                <li><nama_pemain_1></li>
-                <!-- ⋮ Other cast members ⋮ -->
-                <li><nama_pemain_n></li>
+                <li>{{ row.0 }}</li>
             </ul>
+            {% endfor %}
             <p>Penulis Skenario:</p>
+            {% for row in penulis %}
             <ul>
-                <li><nama_penulis_skenario_1></li>
-                <!-- ⋮ Other scriptwriters ⋮ -->
-                <li><nama_penulis_skenario_3></li>
+                <li>{{ row.0 }}</li>
             </ul>
-            <p>Sutradara: <data></p>
+            {% endfor %}
+            <p>Sutradara: {{ sutradara.0 }}</p>
         </div>
 
         <!-- Bagian Ulasan -->
@@ -65,28 +65,81 @@
 
         <!-- Daftar Ulasan -->
         <ul id="reviewList">
-            
         </ul>
     </div>
 </body>
 
 <script>
     document.getElementById('submitReviewButton').addEventListener('click', function () {
-        // Get review description, rating, and username
         var reviewDescription = document.getElementById('reviewDescriptionInput').value;
         var reviewRating = document.getElementById('reviewRatingInput').value;
-        var username = "John Doe"; // Example username\
+        var username = "{{ username }}"; // Ambil username dari konteks
 
-        // Create a new list item element for the review
-        var newReview = document.createElement('li');
-        newReview.textContent = username + ": " + reviewDescription + ' - Rating: ' + reviewRating;
-
-        // Append the new review to the review list
-        document.getElementById('reviewList').appendChild(newReview);
-
-        // Clear input fields after submission
-        document.getElementById('reviewDescriptionInput').value = '';
-        document.getElementById('reviewRatingInput').value = '0'; //default
+        // Kirim data ulasan ke view Django menggunakan Ajax
+        fetch("{% url 'tayangan:submit_review' %}?id=" + "{{ id }}" + "&deskripsi=" + reviewDescription + "&rating=" + reviewRating, {
+            method: 'POST',
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Error in submitting review');
+            }
+        })
+        .then(data => {
+            // Clear input fields after submission
+            document.getElementById('reviewDescriptionInput').value = '';
+            document.getElementById('reviewRatingInput').value = '0';
+        })
+        .then(() => {
+                // Tampilkan ulasan di halaman
+                fetchReviews();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Tampilkan pesan error jika terjadi kesalahan
+            alert('Error in submitting review');
+        });
     });
+
+    // Ketika halaman dimuat, panggil fungsi untuk mendapatkan ulasan
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchReviews();
+    });
+
+    // Fungsi untuk mendapatkan ulasan dari server
+    function fetchReviews() {
+        fetch("{% url 'tayangan:get_reviews' %}?id=" + "{{ id }}")  // Sesuaikan dengan URL endpoint Anda
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                else {
+                    throw new Error('Error in fetching reviews');
+                }
+            })
+            .then(reviews => {
+                // Tampilkan ulasan di halaman
+                displayReviews(reviews);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Tampilkan pesan error jika terjadi kesalahan
+                alert('Error in fetching reviews');
+            });
+    }
+
+    // Fungsi untuk menampilkan ulasan di halaman
+    function displayReviews(reviews) {
+        var reviewList = document.getElementById('reviewList');
+        // Hapus semua ulasan yang ada sebelum menambahkan ulasan baru
+        reviewList.innerHTML = '';
+
+        reviews.forEach(review => {
+            var newReview = document.createElement('li');
+            newReview.textContent = "By: " + review.username + " - " + review.deskripsi + ' - Rating: ' + review.rating + " / 5";
+            reviewList.appendChild(newReview);
+        });
+    }
 </script>
 {% endblock content %}

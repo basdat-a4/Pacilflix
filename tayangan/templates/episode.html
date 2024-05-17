@@ -10,10 +10,10 @@
         <h1>HALAMAN EPISODE</h1>
 
         <!-- Judul Episode -->
-        <h2>Judul: <data></h2>
+        <h2>Judul: {{ judul.0 }}</h2>
 
         <!-- Sub Judul Episode -->
-        <h3>Sub Judul: <data></h3>
+        <h3>Sub Judul: {{ subjudul }}</h3>
 
         <!-- Tombol Aksi -->
         <div class="mb-3">
@@ -22,19 +22,19 @@
 
         <!-- Informasi Episode -->
         <div class="mb-3">
-            <p>Sinopsis Episode: <data></p>
-            <p>Durasi Episode: <data></p>
-            <p>URL Episode: <data></p>
-            <p>Tanggal Rilis Episode: <data></p>
+            <p>Sinopsis Episode: {{ dataEpisode.0 }}</p>
+            <p>Durasi Episode: {{ dataEpisode.1 }} menit</p>
+            <p>URL Episode: {{ dataEpisode.2 }}</p>
+            <p>Tanggal Rilis Episode: {{ dataEpisode.3 }}</p>
         </div>
 
         <!-- Daftar Episode Lainnya -->
         <h3>Episode Lainnya:</h3>
-        <ul>
-            <li><a href="#">Episode 1</a></li>
-            <!-- ⋮ Other episodes ⋮ -->
-            <li><a href="#">Episode N</a></li>
-        </ul>
+        {% for row in episode %}
+            <ul>
+                <li><a href="{% url 'tayangan:show_episode' id row.1 %}">{{ row.0 }}</a></li>
+            </ul>
+        {% endfor %}
     </div>
 </body>
 {% endblock content %}
