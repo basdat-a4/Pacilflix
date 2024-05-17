@@ -3,10 +3,10 @@ from django.db import connection
 from authentication.views import login_required_custom
 
 # Create your views here.
-# @login_required_custom
+@login_required_custom
 def show_langganan(request):
-    # user = request.COOKIES['username']
-    user = 'mason_choi'
+    user = request.COOKIES['username']
+
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
 
@@ -60,13 +60,12 @@ def show_langganan(request):
     
     return render(request, "kelola_langganan.html", context)
 
-# @login_required_custom
+@login_required_custom
 def show_beli(request, paket):
     if request.method == 'POST':
         metode_pembayaran = request.POST.get('pay')
 
-        # user = request.COOKIES['username']
-        user = 'mason_choi'
+        user = request.COOKIES['username']
         
         cursor = connection.cursor()
         cursor.execute("SET search_path TO pacilflix;")

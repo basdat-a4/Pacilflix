@@ -3,7 +3,7 @@ from django.db import connection
 from authentication.views import login_required_custom
 
 # Create your views here.
-
+@login_required_custom
 def show_contributors(request):
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
@@ -39,7 +39,7 @@ def show_contributors(request):
 
     return render(request, "daftar_kontributor.html", {"rows": rows})
 
-
+@login_required_custom
 def show_sutradara(request):
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
@@ -57,7 +57,7 @@ def show_sutradara(request):
 
     return render(request, "daftar_kontributor.html", {"rows": rows})
 
-
+@login_required_custom
 def show_pemain(request):
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
@@ -75,7 +75,7 @@ def show_pemain(request):
 
     return render(request, "daftar_kontributor.html", {"rows": rows})
 
-
+@login_required_custom
 def show_penulis(request):
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
