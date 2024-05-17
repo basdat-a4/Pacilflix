@@ -15,21 +15,37 @@
             <button class="btn btn-primary" type="button" id="searchButton">Search</button>
         </div>
 
-        <!-- Opsi Top 10 -->
-        <div class="mb-3">
-            <button type="button" class="btn btn-primary me-2">Top 10 Global (default)</button>
-            <button type="button" class="btn btn-primary">Top 10 Negara Pengguna</button>
+        <!-- Daftar Hasil Pencarian -->
+        <div id="searchResults" style="display: none;">
+            <h3>Hasil Pencarian</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Judul</th>
+                        <th>Sinopsis Trailer</th>
+                        <th>URL Trailer</th>
+                        <th>Tanggal Rilis Trailer</th>
+                        <th>Tayangan</th>
+                    </tr>
+                </thead>
+                <tbody id="searchResultsBody">
+                    <!-- Data hasil pencarian akan dimasukkan di sini menggunakan JavaScript -->
+                </tbody>
+            </table>
         </div>
+
+        <!-- Opsi Top 10 -->
+        <h2>TOP 10 GLOBAL TAYANGAN MINGGU INI</h2>
 
         <!-- Tabel Tayangan Terbaik -->
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>Peringkat</th>
                     <th>Judul</th>
-                    <th>Sinopsis</th>
-                    <th>Trailer</th>
-                    <th>Tanggal Rilis</th>
+                    <th>Sinopsis Trailer</th>
+                    <th>URL Trailer</th>
+                    <th>Tanggal Rilis Trailer</th>
                     <th>Total View 7 Hari Terakhir</th>
                     <th>Tayangan</th>
                 </tr>
@@ -45,7 +61,6 @@
                     <td><data></td>
                     <td><button type="button" class="btn btn-primary">Halaman Tayangan</button></td>
                 </tr>
-                <!-- ⋮ Other rows ⋮ -->
             </tbody>
         </table>
 
@@ -56,23 +71,27 @@
             <thead>
                 <tr>
                     <th>Judul</th>
-                    <th>Sinopsis</th>
-                    <th>Trailer</th>
-                    <th>Tanggal Rilis</th>
+                    <th>Sinopsis Trailer</th>
+                    <th>URL Trailer</th>
+                    <th>Tanggal Rilis Trailer</th>
                     <th>Tayangan</th>
                 </tr>
             </thead>
+            {% for row in rowsFilm %}
             <tbody>
-                <!-- Data film -->
                 <tr>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><button type="button" class="btn btn-primary">Halaman Tayangan</button></td>
+                    <td>{{row.0}}</td>
+                    <td>{{row.1}}</td>
+                    <td>{{row.2}}</td>
+                    <td>{{row.3}}</td>
+                    <td>
+                    {% if paketAktif %}
+                        <a href="{% url 'tayangan:show_film' row.4 %}"><button type="button" class="btn btn-primary">Halaman Tayangan</button></a>
+                    {% endif %}
+                    </td>
                 </tr>
-                <!-- ⋮ Other rows ⋮ -->
             </tbody>
+            {% endfor %}
         </table>
 
         <!-- Kategori: Series -->
@@ -82,47 +101,65 @@
             <thead>
                 <tr>
                     <th>Judul</th>
-                    <th>Sinopsis</th>
-                    <th>Trailer</th>
-                    <th>Tanggal Rilis</th>
+                    <th>Sinopsis Trailer</th>
+                    <th>URL Trailer</th>
+                    <th>Tanggal Rilis Trailer</th>
                     <th>Tayangan</th>
                 </tr>
             </thead>
+            {% for row in rowsSeries %}
             <tbody>
-                <!-- Data series -->
                 <tr>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><button type="button" class="btn btn-primary">Halaman Tayangan</button></td>
+                    <td>{{row.0}}</td>
+                    <td>{{row.1}}</td>
+                    <td>{{row.2}}</td>
+                    <td>{{row.3}}</td>
+                    <td>
+                    {% if paketAktif %}
+                        <a href="{% url 'tayangan:show_series' row.4 %}"><button type="button" class="btn btn-primary">Halaman Tayangan</button></a></td>
+                    {% endif %}
+                    </td>
                 </tr>
-                <!-- ⋮ Other rows ⋮ -->
             </tbody>
+            {% endfor %}
         </table>
-    </div>
-
-    <!-- Modal for Search Results -->
-    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="searchModalLabel">HASIL PENCARIAN</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Placeholder for search results -->
-                </div>
-            </div>
-        </div>
     </div>
 </body>
 
 <script>
-    // JavaScript to show search modal on button click
     document.getElementById('searchButton').addEventListener('click', function () {
-        console.log("Search button clicked!");
-        $('#searchModal').modal('show');
+        var searchInput = document.getElementById('searchInput').value;
+        fetchSearchResults(searchInput);
     });
+
+    function fetchSearchResults(searchInput) {
+        fetch("{% url 'tayangan:search_tayangan' %}?searchInput=" + searchInput)
+            .then(response => response.json())
+            .then(data => {
+                var searchResultsBody = document.getElementById('searchResultsBody');
+                searchResultsBody.innerHTML = '';
+                data.forEach(result => {
+                    var row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${result.judul}</td>
+                        <td>${result.sinopsis_trailer}</td>
+                        <td>${result.url_video_trailer}</td>
+                        <td>${result.release_date_trailer}</td>
+                        
+                    `;
+                    if ('{{ paketAktif }}') {
+                        // Check if result.isFilm is true
+                        if (result.isFilm) {
+                            row.innerHTML += `<a href="/tayangan/film/${result.id}"><button type="button" class="btn btn-primary">Halaman Tayangan</button></a>`;
+                        } else {
+                            row.innerHTML += `<a href="/tayangan/series/${result.id}"><button type="button" class="btn btn-primary">Halaman Tayangan</button></a>`;
+                        }
+                    }
+                    searchResultsBody.appendChild(row);
+                });
+                document.getElementById('searchResults').style.display = 'block';
+            })
+            .catch(error => console.error('Error:', error));
+    }
 </script>
 {% endblock content %}
