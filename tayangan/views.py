@@ -401,3 +401,37 @@ def search_tayangan(request):
         return JsonResponse(search_results_list, safe=False)
     else:
         return JsonResponse([], safe=False)
+    
+def search_trailer(request):
+    if request.method == 'GET' and 'searchInput' in request.GET:
+        search_input = request.GET.get('searchInput')
+
+        cursor = connection.cursor()
+        cursor.execute("SET search_path TO pacilflix;")
+
+        cursor.execute("""
+                        SELECT
+                            t.judul,
+                            t.sinopsis_trailer,
+                            t.url_video_trailer,
+                            t.release_date_trailer
+                        FROM
+                            TAYANGAN t
+                        WHERE
+                            t.judul ILIKE %s
+                        """, ['%' + search_input + '%'])
+        search_results = cursor.fetchall()
+
+    
+        search_results_list = []
+        for result in search_results:
+            search_results_list.append({
+                'judul': result[0],
+                'sinopsis_trailer': result[1],
+                'url_video_trailer': result[2],
+                'release_date_trailer': result[3],
+            })
+
+        return JsonResponse(search_results_list, safe=False)
+    else:
+        return JsonResponse([], safe=False)
