@@ -3,8 +3,7 @@ from django.db import connection
 from django.http import JsonResponse
 
 def daftar_unduhan(request):
-    if request.user.is_authenticated:
-        username = request.user.username
+        username = request.COOKIES["username"]
         with connection.cursor() as cursor:
             cursor.execute("""
                            SELECT id_tayangan, username, judul, timestamp
@@ -13,8 +12,6 @@ def daftar_unduhan(request):
                            """, [username])
             unduhan_list = cursor.fetchall()
         return render(request, 'daftar_unduhan.html', {'unduhan_list': unduhan_list, 'user': request.user})
-    else:
-        return render(request, 'daftar_unduhan.html', {'user': request.user})
 
 
 def daftar_favorit(request):
