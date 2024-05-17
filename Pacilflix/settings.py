@@ -142,17 +142,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-# Create your views here.
-def kelola_daftar_unduhan(request):
-    username_cookie = request.COOKIES.get('username')
-    cursor.execute('SELECT "judul", "timestamp" FROM "TAYANGAN_TERUNDUH", "TAYANGAN" WHERE "username" = %s AND "id" = "id_tayangan"', [username_cookie])
-    daftar_unduhan = cursor.fetchall()
-    context = {
-        'username_cookie': username_cookie,
-        'daftar_unduhan': daftar_unduhan,
-    }
-
-    # Mengambil daftar unduhan dari database
-    return render(request, 'daftar_unduhan.html', context)
