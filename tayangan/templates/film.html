@@ -10,7 +10,7 @@
         <h1>HALAMAN FILM</h1>
 
         <!-- Judul Film -->
-        <h2>Judul: <data></h2>
+        <h2>Judul: {{ dataFilm.1 }}</h2>
         <input type="range" class="form-range" min="0" max="100" id="durasi">
         <!-- Tombol-->
         <div class="mb-3">
@@ -21,32 +21,32 @@
 
         <!-- Informasi Film -->
         <div class="mb-3">
-            <p>Total View: <data></p>
-            <p>Rating Rata-Rata: <data></p>
-            <p>Sinopsis: <data></p>
-            <p>Durasi Film: <data></p>
-            <p>Tanggal Rilis Film: <data></p>
-            <p>URL Film: <data></p>
+            <p>Total View: NOT YET</p>
+            <p>Rating Rata-Rata: {{ avgRating.0 }} / 5.0</p>
+            <p>Sinopsis: {{ dataFilm.2 }}</p>
+            <p>Durasi Film: {{ dataFilm.3 }} menit</p>
+            <p>Tanggal Rilis Film: {{ dataFilm.4 }}</p>
+            <p>URL Film: {{ dataFilm.5 }}</p>
             <p>Genre:</p>
+            {% for row in genre %}
             <ul>
-                <li><data_genre_1></li>
-                <!-- ⋮ Other genres ⋮ -->
-                <li><data_genre_n></li>
+                <li>{{ row.0 }}</li>
             </ul>
-            <p>Asal Negara: <data></p>
+            {% endfor %}
+            <p>Asal Negara: {{ dataFilm.6 }}</p>
             <p>Pemain:</p>
+            {% for row in pemain %}
             <ul>
-                <li><data_pemain_1></li>
-                <!-- ⋮ Other cast members ⋮ -->
-                <li><data_pemain_n></li>
+                <li>{{ row.0 }}</li>
             </ul>
+            {% endfor %}
             <p>Penulis Skenario:</p>
+            {% for row in penulis %}
             <ul>
-                <li><data_penulis_skenario_1></li>
-                <!-- ⋮ Other scriptwriters ⋮ -->
-                <li><data_penulis_skenario_3></li>
+                <li>{{ row.0 }}</li>
             </ul>
-            <p>Sutradara: <data></p>
+            {% endfor %}
+            <p>Sutradara: {{ sutradara.0 }}</p>
         </div>
 
         <!-- Bagian Ulasan -->

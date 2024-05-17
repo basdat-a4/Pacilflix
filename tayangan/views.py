@@ -75,7 +75,8 @@ def show_trailer(request):
     context = {
         "rowsSeries": rowsSeries,
         "rowsTop10": rowsTop10,
-        "rowsFilm" : rowsFilm
+        "rowsFilm" : rowsFilm,
+        'username': request.COOKIES.get('username')
     }
     return render(request, "trailer.html", context)
 
@@ -152,30 +153,205 @@ def show_tayangan(request):
                     """) 
     rowsFilm = cursor.fetchall()
 
-    dummy_user = "mason_choi"
+    user = request.COOKIES['username']
     cursor.execute("""
                     SELECT t.username 
                     FROM TRANSACTION t 
                     WHERE %s = t.username 
                         AND t.end_date_time >= CURRENT_DATE;
-                    """, [dummy_user])
+                    """, [user])
     paketAktif = cursor.fetchall()
 
     context = {
         "rowsSeries": rowsSeries,
         "rowsTop10": rowsTop10,
         "rowsFilm" : rowsFilm,
-        "paketAktif" : paketAktif
+        "paketAktif" : paketAktif,
+        'username': user
     }
     return render(request, "tayangan.html", context)
 
 def show_film(request, id):
-    context = {"id" : id}
+    cursor = connection.cursor()
+    cursor.execute("SET search_path TO pacilflix;")
+
+    cursor.execute("""
+                SELECT f.id_tayangan, t.judul, t.sinopsis, f.durasi_film, f.release_date_film, f.url_video_film, t.asal_negara
+                FROM FILM f
+                JOIN TAYANGAN t ON f.id_tayangan = t.id
+                WHERE f.id_tayangan = %s;
+                    """, [id])
+    dataFilm = cursor.fetchone()
+
+    cursor.execute("""
+                    SELECT ROUND(AVG(rating), 1) AS rata_rata_rating
+                    FROM ULASAN
+                    WHERE id_tayangan = %s;
+                """, [id])
+    avgRating = cursor.fetchone()
+
+    cursor.execute("""
+                    SELECT genre
+                    FROM GENRE_TAYANGAN
+                    WHERE id_tayangan = %s;
+                """, [id])
+    genre = cursor.fetchall()
+
+    cursor.execute("""
+                    SELECT c.nama
+                    FROM CONTRIBUTORS c
+                    JOIN MEMAINKAN_TAYANGAN m ON c.id = m.id_pemain
+                    WHERE m.id_tayangan = %s;
+                """, [id])
+    pemain = cursor.fetchall()
+
+    cursor.execute("""
+                    SELECT c.nama
+                    FROM CONTRIBUTORS c
+                    JOIN MENULIS_SKENARIO_TAYANGAN m ON c.id = m.id_penulis_skenario
+                    WHERE m.id_tayangan = %s;
+                """, [id])
+    penulis = cursor.fetchall()
+
+    cursor.execute("""
+                    SELECT c.nama
+                    FROM CONTRIBUTORS c
+                    JOIN TAYANGAN t ON c.id = t.id_sutradara
+                    WHERE t.id = %s;
+                """, [id])
+    sutradara = cursor.fetchone()
+
+    cursor.execute("""
+                    SELECT username, deskripsi, rating
+                    FROM ULASAN
+                    WHERE id_tayangan = %s
+                    ORDER BY timestamp DESC;
+                """, [id])
+    ulasan = cursor.fetchall()
+
+    context = {
+        'username': request.COOKIES.get('username'),
+        "id" : id,
+        "avgRating" : avgRating,
+        "genre": genre,
+        "pemain": pemain,
+        "penulis": penulis,
+        "sutradara": sutradara,
+        "ulasan": ulasan,
+        "dataFilm": dataFilm
+    }
     return render(request, "film.html", context)
 
 def show_series(request, id):
-    context = {"id" : id}
+    cursor = connection.cursor()
+    cursor.execute("SET search_path TO pacilflix;")
+
+    cursor.execute("""
+                    SELECT s.id_tayangan, t.judul, t.sinopsis, t.asal_negara
+                    FROM SERIES s
+                    JOIN TAYANGAN t ON s.id_tayangan = t.id
+                    WHERE s.id_tayangan = %s;
+                    """, [id])
+    dataSeries = cursor.fetchone()
+
+    cursor.execute("""
+                    SELECT ROUND(AVG(rating), 1) AS rata_rata_rating
+                    FROM ULASAN
+                    WHERE id_tayangan = %s;
+                """, [id])
+    avgRating = cursor.fetchone()
+
+    cursor.execute("""
+                    SELECT genre
+                    FROM GENRE_TAYANGAN
+                    WHERE id_tayangan = %s;
+                """, [id])
+    genre = cursor.fetchall()
+
+    cursor.execute("""
+                    SELECT c.nama
+                    FROM CONTRIBUTORS c
+                    JOIN MEMAINKAN_TAYANGAN m ON c.id = m.id_pemain
+                    WHERE m.id_tayangan = %s;
+                """, [id])
+    pemain = cursor.fetchall()
+
+    cursor.execute("""
+                    SELECT c.nama
+                    FROM CONTRIBUTORS c
+                    JOIN MENULIS_SKENARIO_TAYANGAN m ON c.id = m.id_penulis_skenario
+                    WHERE m.id_tayangan = %s;
+                """, [id])
+    penulis = cursor.fetchall()
+
+    cursor.execute("""
+                    SELECT c.nama
+                    FROM CONTRIBUTORS c
+                    JOIN TAYANGAN t ON c.id = t.id_sutradara
+                    WHERE t.id = %s;
+                """, [id])
+    sutradara = cursor.fetchone()
+
+    cursor.execute("""
+                    SELECT username, deskripsi, rating
+                    FROM ULASAN
+                    WHERE id_tayangan = %s
+                    ORDER BY timestamp DESC;
+                """, [id])
+    ulasan = cursor.fetchall()
+
+    cursor.execute("""
+                    SELECT url_video, sub_judul
+                    FROM EPISODE
+                    WHERE id_series = %s;
+                """, [id])
+    episode = cursor.fetchall()
+
+    context = {
+        'username': request.COOKIES.get('username'),
+        "id" : id,
+        "avgRating" : avgRating,
+        "genre": genre,
+        "pemain": pemain,
+        "penulis": penulis,
+        "sutradara": sutradara,
+        "ulasan": ulasan,
+        "dataSeries": dataSeries,
+        "episode": episode
+    }
     return render(request, "series.html", context)
 
-def show_episode(request):
-    return render(request, "episode.html")
+def show_episode(request, id, subjudul):
+    cursor = connection.cursor()
+    cursor.execute("SET search_path TO pacilflix;")
+
+    cursor.execute("""
+                    SELECT sinopsis, durasi, url_video, release_date
+                    FROM EPISODE
+                    WHERE id_series = %s AND sub_judul = %s;
+                    """, [id, subjudul])
+    dataEpisode = cursor.fetchone()
+
+    cursor.execute("""
+                    SELECT judul
+                    FROM TAYANGAN
+                    WHERE id = %s;
+                    """, [id])
+    judul = cursor.fetchone()
+
+    cursor.execute("""
+                    SELECT url_video, sub_judul
+                    FROM EPISODE
+                    WHERE id_series = %s AND sub_judul != %s;
+                """, [id, subjudul])
+    episode = cursor.fetchall()
+
+    context = {
+        'username': request.COOKIES.get('username'),
+        "id" : id,
+        "subjudul" : subjudul,
+        "dataEpisode": dataEpisode,
+        "judul" : judul,
+        "episode": episode
+    }
+    return render(request, "episode.html", context)

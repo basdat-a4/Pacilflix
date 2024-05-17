@@ -10,15 +10,15 @@
         <h1>HALAMAN SERIES</h1>
 
         <!-- Judul Series -->
-        <h2>Judul: <data></h2>
+        <h2>Judul: {{ dataSeries.1 }}</h2>
 
         <!-- Daftar Episode -->
         <h3>Episode:</h3>
-        <ul>
-            <li><a href="#">Episode 1</a></li>
-            <!-- ⋮ Other episodes ⋮ -->
-            <li><a href="#">Episode N</a></li>
-        </ul>
+        {% for row in episode %}
+            <ul>
+                <li><a href="{% url 'tayangan:show_episode' id row.1 %}">{{ row.0 }}</a></li>
+            </ul>
+        {% endfor %}
 
         <!-- Tombol Aksi -->
         <div class="mb-3">
@@ -28,29 +28,29 @@
 
         <!-- Informasi Series -->
         <div class="mb-3">
-            <p>Total View: <data></p>
-            <p>Rating Rata-Rata: <data></p>
-            <p>Sinopsis: <data></p>
+            <p>Total View: NOT YET</p>
+            <p>Rating Rata-Rata: {{ avgRating.0 }} / 5.0</p>
+            <p>Sinopsis: {{ dataSeries.1 }}</p>
             <p>Genre:</p>
+            {% for row in genre %}
             <ul>
-                <li><data_genre_1></li>
-                <!-- ⋮ Other genres ⋮ -->
-                <li><data_genre_n></li>
+                <li>{{ row.0 }}</li>
             </ul>
-            <p>Asal Negara: <data></p>
+            {% endfor %}
+            <p>Asal Negara: {{ dataFilm.6 }}</p>
             <p>Pemain:</p>
+            {% for row in pemain %}
             <ul>
-                <li><nama_pemain_1></li>
-                <!-- ⋮ Other cast members ⋮ -->
-                <li><nama_pemain_n></li>
+                <li>{{ row.0 }}</li>
             </ul>
+            {% endfor %}
             <p>Penulis Skenario:</p>
+            {% for row in penulis %}
             <ul>
-                <li><nama_penulis_skenario_1></li>
-                <!-- ⋮ Other scriptwriters ⋮ -->
-                <li><nama_penulis_skenario_3></li>
+                <li>{{ row.0 }}</li>
             </ul>
-            <p>Sutradara: <data></p>
+            {% endfor %}
+            <p>Sutradara: {{ sutradara.0 }}</p>
         </div>
 
         <!-- Bagian Ulasan -->

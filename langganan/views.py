@@ -1,9 +1,11 @@
 from django.shortcuts import redirect, render
 from django.db import connection
+from authentication.views import login_required_custom
 
 # Create your views here.
+@login_required_custom
 def show_langganan(request):
-    dummy_user = "mason_choi"
+    user = request.COOKIES['username']
 
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
@@ -19,7 +21,7 @@ def show_langganan(request):
     SELECT T.nama_paket, T.start_date_time, T.end_date_time, T.metode_pembayaran, T.timestamp_pembayaran, P.harga
     FROM TRANSACTION T JOIN PAKET P ON P.nama = T.nama_paket
     WHERE T.username = %s;
-    """, [dummy_user])
+    """, [user])
     transaksi = cursor.fetchall()
 
     cursor.execute("""
@@ -27,7 +29,7 @@ def show_langganan(request):
     FROM TRANSACTION T JOIN PAKET P ON P.nama = T.nama_paket JOIN DUKUNGAN_PERANGKAT D ON D.nama_paket = P.nama
     WHERE T.username = %s AND CURRENT_DATE BETWEEN T.start_date_time AND T.end_date_time
     GROUP BY T.nama_paket, P.harga, P.resolusi_layar, T.start_date_time, T.end_date_time;
-    """, [dummy_user])
+    """, [user])
     paket_aktif = cursor.fetchone()
 
     if paket_aktif is None:
@@ -58,16 +60,17 @@ def show_langganan(request):
     
     return render(request, "kelola_langganan.html", context)
 
+@login_required_custom
 def show_beli(request, paket):
     if request.method == 'POST':
         metode_pembayaran = request.POST.get('pay')
 
-        dummy_user = "mason_choi"
+        user = request.COOKIES['username']
         
         cursor = connection.cursor()
         cursor.execute("SET search_path TO pacilflix;")
 
-        cursor.execute("INSERT INTO TRANSACTION VALUES(%s, CURRENT_DATE, CURRENT_DATE + INTERVAL '1 MONTH', %s, %s, CURRENT_TIMESTAMP)", [dummy_user, paket, metode_pembayaran])
+        cursor.execute("INSERT INTO TRANSACTION VALUES(%s, CURRENT_DATE, CURRENT_DATE + INTERVAL '1 MONTH', %s, %s, CURRENT_TIMESTAMP)", [user, paket, metode_pembayaran])
         return redirect('langganan:show_langganan')
     
     cursor = connection.cursor()
