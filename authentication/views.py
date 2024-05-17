@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.db import connection
 import datetime
 
-cursor = connection.cursor()
 
 def login_required_custom(view_func):
     def _wrapped_view_func(request, *args, **kwargs):
@@ -20,9 +19,10 @@ def show_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        cursor.execute("SET search_path TO pacilflix;")
-        cursor.execute(f"SELECT * FROM PENGGUNA P WHERE P.username = '{username}' AND P.password = '{password}'")
-        users = cursor.fetchone()
+        with connection.cursor() as cursor:
+            cursor.execute("SET search_path TO Pacilflix;")
+            cursor.execute("SELECT * FROM PENGGUNA WHERE username = %s AND password = %s", [username, password])
+            users = cursor.fetchone()
 
         if users is not None:
             request.session['username'] = users[0]
@@ -41,16 +41,16 @@ def show_register(request):
         password = request.POST.get('password')
         negara = request.POST.get('negara_asal')
 
-        cursor.execute("SET search_path TO pacilflix;")
-        cursor.execute("SELECT * FROM PENGGUNA WHERE username = %s", [username])
-        if cursor.fetchone() is not None:
-            messages.error(request, f"Username {username} sudah tersedia.")
-            return render(request, 'register.html', {'form': request.POST})
-
-        cursor.execute("INSERT INTO pengguna (username, password, negara_asal) VALUES (%s, %s, %s)", [username, password, negara])
+        with connection.cursor() as cursor:
+            cursor.execute("SET search_path TO Pacilflix;")
+            cursor.execute("SELECT * FROM PENGGUNA WHERE username = %s", [username])
+            if cursor.fetchone() is not None:
+                messages.error(request, f"Username {username} sudah tersedia.")
+                return render(request, 'register.html', {'form': request.POST})
+            cursor.execute("INSERT INTO PENGGUNA (username, password, negara_asal) VALUES (%s, %s, %s)", [username, password, negara])
+        
         messages.success(request, 'Your account has been successfully created!')
         return redirect('authentication:show_login')
-
     return render(request, 'register.html')
 
 def logout_user(request):
