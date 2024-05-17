@@ -20,7 +20,7 @@ def show_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        cursor.execute("SET search_path TO pacilflix;")
+        cursor.execute("SET search_path TO Pacilflix;")
         cursor.execute(f"SELECT * FROM PENGGUNA P WHERE P.username = '{username}' AND P.password = '{password}'")
         users = cursor.fetchone()
 
@@ -41,7 +41,7 @@ def show_register(request):
         password = request.POST.get('password')
         negara = request.POST.get('negara_asal')
 
-        cursor.execute("SET search_path TO pacilflix;")
+        cursor.execute("SET search_path TO Pacilflix;")
         cursor.execute("SELECT * FROM PENGGUNA WHERE username = %s", [username])
         if cursor.fetchone() is not None:
             messages.error(request, f"Username {username} sudah tersedia.")
