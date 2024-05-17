@@ -41,7 +41,7 @@ def show_langganan(request):
         akhir = "-"
     else:
         nama = paket_aktif[0]
-        harga = paket_aktif[1]
+        harga = f"${paket_aktif[1]}"
         resolusi = paket_aktif[2]
         perangkat = paket_aktif[3]
         mulai = paket_aktif[4]
