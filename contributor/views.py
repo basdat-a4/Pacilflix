@@ -37,7 +37,11 @@ def show_contributors(request):
                    """)
     rows = cursor.fetchall()
 
-    return render(request, "daftar_kontributor.html", {"rows": rows})
+    context = {
+        "rows": rows,
+        "username": request.COOKIES['username']
+    }
+    return render(request, "daftar_kontributor.html", context)
 
 @login_required_custom
 def show_sutradara(request):
@@ -55,7 +59,11 @@ def show_sutradara(request):
                    """)
     rows = cursor.fetchall()
 
-    return render(request, "daftar_kontributor.html", {"rows": rows})
+    context = {
+        "rows": rows,
+        "username": request.COOKIES['username']
+    }
+    return render(request, "daftar_kontributor.html", context)
 
 @login_required_custom
 def show_pemain(request):
@@ -73,7 +81,11 @@ def show_pemain(request):
                    """)
     rows = cursor.fetchall()
 
-    return render(request, "daftar_kontributor.html", {"rows": rows})
+    context = {
+        "rows": rows,
+        "username": request.COOKIES['username']
+    }
+    return render(request, "daftar_kontributor.html", context)
 
 @login_required_custom
 def show_penulis(request):
@@ -91,4 +103,8 @@ def show_penulis(request):
                    """)
     rows = cursor.fetchall()
 
-    return render(request, "daftar_kontributor.html", {"rows": rows})
+    context = {
+        "rows": rows,
+        "username": request.COOKIES['username']
+    }
+    return render(request, "daftar_kontributor.html", context)

@@ -41,7 +41,7 @@ def show_langganan(request):
         akhir = "-"
     else:
         nama = paket_aktif[0]
-        harga = paket_aktif[1]
+        harga = f"${paket_aktif[1]}"
         resolusi = paket_aktif[2]
         perangkat = paket_aktif[3]
         mulai = paket_aktif[4]
@@ -55,7 +55,8 @@ def show_langganan(request):
         "resolusi":resolusi,
         "perangkat":perangkat,
         "mulai":mulai,
-        "akhir":akhir
+        "akhir":akhir,
+        "username": user
     }
     
     return render(request, "kelola_langganan.html", context)
@@ -84,7 +85,12 @@ def show_beli(request, paket):
                    """, [paket])
     paket = cursor.fetchone()
 
-    return render(request, "beli_langganan.html", {"paket":paket})
+    context = {
+        "paket":paket,
+        "username": request.COOKIES['username']
+    }
+
+    return render(request, "beli_langganan.html", context)
 
 # def beli_paket(request, paket):
 #     if request.method == 'POST':
