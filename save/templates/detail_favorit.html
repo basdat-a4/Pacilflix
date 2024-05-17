@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% include "navbar-user.html" %}
+<h1>Detail Daftar Favorit</h1>
+
+<h2>Daftar Favorit {{ favorit_id }}</h2>
+{% if tayangan_list %}
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Judul Tayangan</th>
+            <th scope="col">Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tayangan in tayangan_list %}
+        <tr>
+            <td>{{ tayangan.0 }}</td>
+            <td><button type="button" class="btn btn-danger btn-sm hapus-data"
+                    onclick="hapusTayangan('{{ tayangan.1 }}, {{ favorit_id }}')">Hapus</button>
+                
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Tidak ada tayangan dalam daftar favorit ini.</p>
+{% endif %}
+
+<script>
+    function hapusTayangan(tayanganId, favoritId) {
+        fetch(`/hapus-tayangan-favorit/${tayanganId}/?favorit_id=${favoritId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Gagal menghapus tayangan dari favorit');
+                }
+            });
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+{% endblock content %}
