@@ -15,7 +15,7 @@
         <!-- Tombol-->
         <div class="mb-3">
             <button type="button" class="btn btn-primary">Tonton</button>
-            <button type="button" class="btn btn-primary">Unduh Tayangan</button>
+            <button type="button" class="btn btn-primary" id="unduhTayanganButton">Unduh Tayangan</button>
             <button type="button" class="btn btn-primary">Favorit Tayangan</button>
         </div>
 
@@ -62,6 +62,56 @@
         <!-- Daftar Ulasan -->
         <ul id="reviewList">
         </ul>
+    </div>
+
+    <!-- Modal Unduh Tayangan-->
+    <!-- copas from save modul -->
+    <div class="modal fade" id="modalUnduhTayangan" tabindex="-1" aria-labelledby="modalUnduhTayanganLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalUnduhTayanganLabel">SUKSES MENAMBAHKAN TAYANGAN KE DAFTAR UNDUHAN
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Selamat! Anda telah berhasil mengunduh [Judul Tayangan] dan akan berlaku hingga [current time + 7
+                        hari]. Cek informasi selengkapnya pada halaman daftar unduhan.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <a href="{% url 'save:daftar_unduhan' %}" class="btn btn-primary">Menuju Daftar Unduhan</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Favorit -->
+    <!-- copas from save modul -->
+    <div class="modal fade" id="modalTambahFavorit" tabindex="-1" aria-labelledby="modalTambahFavoritLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTambahFavoritLabel">TAMBAH KE DAFTAR FAVORIT</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form memilih daftar favorit -->
+                <label for="dropdownDaftarFavorit" class="form-label">Judul Daftar Favorit:</label>
+                <select class="form-select" aria-label="Daftar Favorit" id="dropdownDaftarFavorit">
+                    <!-- Option daftar favorit -->
+                    <option value="1">Judul Favorit 1</option>
+                    <option value="2">Judul Favorit 2</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="btnTambahFavorit">Tambah</button>
+            </div>
+        </div>
+    </div>
     </div>
 </body>
 
@@ -137,5 +187,26 @@
             reviewList.appendChild(newReview);
         });
     }
+
+    document.getElementById('unduhTayanganButton').addEventListener('click', function () {
+        // Kirim permintaan ke server menggunakan AJAX
+        fetch("{% url 'tayangan:tambah_unduhan' %}?id=" + "{{ id }}", {
+            method: 'POST',
+        })
+        .then(response => {
+            if (response.ok) {
+                // Jika permintaan berhasil, tampilkan modal "Berhasil Menambahkan Tayangan ke Daftar Unduhan"
+                $('#modalUnduhTayangan').modal('show');
+            } else {
+                // Jika terjadi kesalahan, lemparkan error
+                throw new Error('Error in adding the movie to the download list');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Tampilkan pesan error jika terjadi kesalahan
+            alert('Error in adding the movie to the download list');
+        });
+    });
 </script>
 {% endblock content %}

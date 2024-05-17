@@ -483,3 +483,18 @@ def submit_review(request):
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+    
+@csrf_exempt
+def tambah_unduhan(request):
+    id = request.GET.get('id')
+    username = request.COOKIES.get('username')
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    cursor = connection.cursor()
+    cursor.execute("SET search_path TO pacilflix;")
+
+    cursor.execute("""
+    INSERT INTO TAYANGAN_TERUNDUH VALUES (%s, %s, %s);
+                """, [id, username, timestamp])
+    return JsonResponse({'status': 'success'})
+    
