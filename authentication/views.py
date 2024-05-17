@@ -1,7 +1,10 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import connection
 import datetime
+
+from django.urls import reverse
 
 cursor = connection.cursor()
 
@@ -24,7 +27,7 @@ def show_login(request):
         users = cursor.fetchone()
 
         if users is not None:
-            response = redirect('tayangan:show_tayangan')
+            response = HttpResponseRedirect(reverse("tayangan:show_tayangan"))
             response.set_cookie('username', users[0])
             response.set_cookie('last_login', str(datetime.datetime.now()))
             return response
@@ -43,16 +46,16 @@ def show_register(request):
         if cursor.fetchone() is not None:
             messages.error(request, f"Username {username} sudah tersedia.")
             return render(request, 'register.html', {'form': request.POST})
-
+        
+        response = HttpResponseRedirect(reverse("authentication:show_login"))
         cursor.execute("INSERT INTO PENGGUNA (username, password, negara_asal) VALUES (%s, %s, %s)", [username, password, negara])
         messages.success(request, 'Your account has been successfully created!')
-        return redirect('authentication:show_login')
-
+        return response
     return render(request, 'register.html')
 
 @login_required_custom
 def logout_user(request):
-    response = redirect('authentication:show_main')
+    response = HttpResponseRedirect(reverse("authentication:show_main"))
     for cookie in request.COOKIES:
         response.delete_cookie(cookie)
     return response
