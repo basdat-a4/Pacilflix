@@ -21,8 +21,13 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'langganan:show_langganan' %}">Subscriptions</a>
                 </li>
-				<li class="nav-item">
-                    <a class="nav-link" href="{% url 'authentication:logout' %}">Logout</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{% url 'authentication:logout' %}">Logout</a></li>
+                    </ul>
                 </li>
             </ul>
         </div>

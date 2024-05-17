@@ -5,13 +5,26 @@ def show_trailer(request):
     return render(request, "trailer.html")
 
 def show_tayangan(request):
-    return render(request, "tayangan.html")
+    context = {
+        'username': request.COOKIES.get('username')
+    }
+    return render(request, 'tayangan.html', context)
+
 
 def show_film(request):
-    return render(request, "film.html")
+    context = {
+        'username': request.COOKIES.get('username')
+    }
+    return render(request, "film.html", context)
 
 def show_series(request):
-    return render(request, "series.html")
+    context = {
+        'username': request.COOKIES.get('username')
+    }
+    return render(request, "series.html", context)
 
 def show_episode(request):
-    return render(request, "episode.html")
+    context = {
+        'username': request.COOKIES.get('username')
+    }
+    return render(request, "episode.html", context)
