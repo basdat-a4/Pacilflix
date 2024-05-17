@@ -1,6 +1,9 @@
+from datetime import datetime
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.db import connection
+from authentication.views import login_required_custom
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 def show_trailer(request):
@@ -435,3 +438,48 @@ def search_trailer(request):
         return JsonResponse(search_results_list, safe=False)
     else:
         return JsonResponse([], safe=False)
+    
+def get_reviews(request):
+    id = request.GET.get('id')
+    cursor = connection.cursor()
+    cursor.execute("SET search_path TO pacilflix;")
+
+    cursor.execute("""
+                    SELECT username, deskripsi, rating
+                    FROM ULASAN
+                    WHERE id_tayangan = %s
+                    ORDER BY timestamp DESC;
+                """, [str(id)])
+    ulasan = cursor.fetchall()
+
+    reviews_data = []
+    for review in ulasan:
+        review_data = {
+            'username': review[0],
+            'deskripsi': review[1],
+            'rating': review[2]
+        }
+        reviews_data.append(review_data)
+
+    return JsonResponse(reviews_data, safe=False)
+
+@csrf_exempt
+def submit_review(request):
+    if request.method == 'POST':
+        # Ambil data dari permintaan AJAX
+        id = request.GET.get('id')
+        deskripsi = request.GET.get("deskripsi")
+        rating = request.GET.get("rating")
+        username = request.COOKIES.get('username')
+
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cursor = connection.cursor()
+        cursor.execute("SET search_path TO pacilflix;")
+        cursor.execute("""
+                        INSERT INTO ULASAN VALUES (%s, %s, %s, %s, %s);
+                        """, [id, username, timestamp, rating, deskripsi])
+
+        # Kirim respons JSON kembali ke front end
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
