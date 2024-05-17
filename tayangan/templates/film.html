@@ -65,6 +65,7 @@
     </div>
 
     <!-- Modal Unduh Tayangan-->
+    <!-- copas from save modul -->
     <div class="modal fade" id="modalUnduhTayangan" tabindex="-1" aria-labelledby="modalUnduhTayanganLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -84,6 +85,33 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Modal Tambah Favorit -->
+    <!-- copas from save modul -->
+    <div class="modal fade" id="modalTambahFavorit" tabindex="-1" aria-labelledby="modalTambahFavoritLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTambahFavoritLabel">TAMBAH KE DAFTAR FAVORIT</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form memilih daftar favorit -->
+                <label for="dropdownDaftarFavorit" class="form-label">Judul Daftar Favorit:</label>
+                <select class="form-select" aria-label="Daftar Favorit" id="dropdownDaftarFavorit">
+                    <!-- Option daftar favorit -->
+                    <option value="1">Judul Favorit 1</option>
+                    <option value="2">Judul Favorit 2</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="btnTambahFavorit">Tambah</button>
+            </div>
+        </div>
+    </div>
     </div>
 </body>
 
