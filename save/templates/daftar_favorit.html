@@ -1,91 +1,85 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% block content %}
 
-    {% include "navbar-user.html" %}
-    <h1>Daftar Favorit</h1>
-    <div class="modal fade" id="modalTambahFavorit" tabindex="-1" aria-labelledby="modalTambahFavoritLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTambahFavoritLabel">TAMBAH KE DAFTAR FAVORIT</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Form memilih daftar favorit -->
-                    <label for="dropdownDaftarFavorit" class="form-label">Judul Daftar Favorit:</label>
-                    <select class="form-select" aria-label="Daftar Favorit" id="dropdownDaftarFavorit">
-                        <!-- Option daftar favorit -->
-                        <option value="1">Judul Favorit 1</option>
-                        <option value="2">Judul Favorit 2</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary" id="btnTambahFavorit">Tambah</button>
-                </div>
+{% include "navbar-user.html" %}
+<h1>Daftar Favorit</h1>
+
+<!-- Modal Tambah Favorit -->
+<div class="modal fade" id="modalTambahFavorit" tabindex="-1" aria-labelledby="modalTambahFavoritLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTambahFavoritLabel">TAMBAH KE DAFTAR FAVORIT</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form memilih daftar favorit -->
+                <label for="dropdownDaftarFavorit" class="form-label">Judul Daftar Favorit:</label>
+                <select class="form-select" aria-label="Daftar Favorit" id="dropdownDaftarFavorit">
+                    <!-- Option daftar favorit -->
+                    <option value="1">Judul Favorit 1</option>
+                    <option value="2">Judul Favorit 2</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="btnTambahFavorit">Tambah</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Tabel Daftar Favorit -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Judul</th>
-                <th scope="col">Waktu Ditambahkan</th>
-                <th scope="col">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Baris-baris data daftar favorit ditambahkan menggunakan JS -->
-        </tbody>
-    </table>
+<!-- Tabel Daftar Favorit -->
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Judul</th>
+            <th scope="col">Waktu Ditambahkan</th>
+            <th scope="col">Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for favorit in favorit_list %}
+        <tr>
+            <td><a href="{% url 'detail_favorit' favorit.0 %}">{{ favorit.1 }}</a></td>
+            <td>{{ favorit.2 }}</td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm hapus-data"
+                    onclick="hapusFavorit('{{ favorit.0 }}')">Hapus</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <div class="fav-tayangan">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahFavorit">
-            Tambah
-        </button>
-    </div>
+<div class="fav-tayangan">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahFavorit">
+        Tambah
+    </button>
+</div>
 
-    <script>
-        // Fungsi menambahkan tayangan ke daftar favorit
-        function tambahKeDaftarFavorit() {
-            // Mengambil nilai dari dropdown
-            let dropdown = document.getElementById("dropdownDaftarFavorit");
-            let selectedOption = dropdown.options[dropdown.selectedIndex].text;
-
-            // Membuat data baru untuk tabel daftar favorit
-            let newRow = document.createElement("tr");
-
-            newRow.innerHTML = `
-                <td>Judul Tayangan</td>
-                <td>${new Date().toLocaleString()}</td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm hapus-data">Hapus</button>
-                </td>
-            `;
-
-            // Memasukkan data baru ke dalam tabel
-            document.querySelector("tbody").appendChild(newRow);
-
-            // Menutup modal
-            let modal = bootstrap.Modal.getInstance(document.getElementById("modalTambahFavorit"));
-            modal.hide();
-
-            // event listener untuk tombol hapus yang baru ditambahkan
-            newRow.querySelector(".hapus-data").addEventListener("click", function() {
-                hapusData(newRow);
+<script>
+    function hapusFavorit(favoritId) {
+        fetch(`/hapus-favorit/${favoritId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Gagal menghapus favorit');
+                }
             });
-        }
+    }
+</script>
 
-        // Fungsi menghapus baris tabel
-        function hapusData(row) {
-            row.remove();
-        }
-
-        document.querySelector("#btnTambahFavorit").addEventListener("click", tambahKeDaftarFavorit);
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
 
 {% endblock content %}
