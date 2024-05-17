@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.db import connection
 
@@ -154,6 +155,7 @@ def show_tayangan(request):
     rowsFilm = cursor.fetchall()
 
     user = request.COOKIES['username']
+
     cursor.execute("""
                     SELECT t.username 
                     FROM TRANSACTION t 
@@ -355,3 +357,47 @@ def show_episode(request, id, subjudul):
         "episode": episode
     }
     return render(request, "episode.html", context)
+
+def search_tayangan(request):
+    if request.method == 'GET' and 'searchInput' in request.GET:
+        search_input = request.GET.get('searchInput')
+
+        cursor = connection.cursor()
+        cursor.execute("SET search_path TO pacilflix;")
+
+        cursor.execute("""
+                        SELECT
+                            t.judul,
+                            t.sinopsis_trailer,
+                            t.url_video_trailer,
+                            t.release_date_trailer,
+                            t.id
+                        FROM
+                            TAYANGAN t
+                        WHERE
+                            t.judul ILIKE %s
+                        """, ['%' + search_input + '%'])
+        search_results = cursor.fetchall()
+
+    
+        search_results_list = []
+        for result in search_results:
+            id = result[4]
+            cursor.execute("""
+                    SELECT f.id_tayangan 
+                    FROM FILM f
+                    WHERE %s = f.id_tayangan;
+                    """, [str(id)])
+            isFilm = cursor.fetchone()
+            search_results_list.append({
+                'judul': result[0],
+                'sinopsis_trailer': result[1],
+                'url_video_trailer': result[2],
+                'release_date_trailer': result[3],
+                'id': result[4],
+                'isFilm' : isFilm
+            })
+
+        return JsonResponse(search_results_list, safe=False)
+    else:
+        return JsonResponse([], safe=False)
