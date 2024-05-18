@@ -41,13 +41,15 @@
             </tr>
         </thead>
         <tbody>
-            {% for judul, timestamp in favorit_list %}
+            {% for favorit in favorit_list %}
             <tr>
-                <td><a href="{% url 'save:daftar_favorit' %}">{{ judul }}</a></td>
-                <td>{{ timestamp }}</td>
+                <td><a href="{% url 'save:detail_favorit' judul=favorit.judul %}">{{ favorit.judul }}</a></td>
+                <td>{{ favorit.timestamp }}</td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-sm hapus-data"
-                        onclick="hapusFavorit('{{ favorit.0 }}')">Hapus</button>
+                    <form action="/save/hapus_favorit/{{ favorit.timestamp_iso }}" method="POST">
+                        {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm hapus-data">Hapus</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}
@@ -61,7 +63,7 @@
     </button>
 </div> -->
 
-<script>
+<!-- <script>
     function hapusFavorit(favoritId) {
         fetch(`/hapus-favorit/${favoritId}/`, {
             method: 'DELETE',
@@ -78,7 +80,7 @@
                 }
             });
     }
-</script>
+</script> -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

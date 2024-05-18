@@ -25,7 +25,11 @@
                     <td>{{ unduhan.0 }}</td>
                     <td>{{ unduhan.1 }}</td>
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm hapus-data">Hapus</button>
+                        <form action="/save/hapus_unduhan/{{ unduhan.3 }}/{{ unduhan.2 }}" method="POST">
+                            {% csrf_token %}
+                            <button type="Submit" class="btn btn-danger btn-sm hapus-data"
+                                data-id="{{ unduhan.3 }}">Hapus</button>
+                        </form>
                         <span class="status-hapus" style="margin-left: 5px;"></span>
                     </td>
                 </tr>
@@ -56,7 +60,7 @@
     </div>
 </div>
 
-<!-- Toast Berhasil Hapus -->
+<!-- Modal Berhasil Hapus -->
 <div class="modal fade" id="modalBerhasilHapus" tabindex="-1" aria-labelledby="modalBerhasilHapusLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -75,61 +79,33 @@
     </div>
 </div>
 
-<script>
-    document.querySelectorAll(".hapus-data").forEach(button => {
-        button.addEventListener("click", function () {
-            hapusData(button.closest("tr"));
+
+<!-- <script>
+    $(document).ready(function () {
+        $('.hapus-data').click(function () {
+            var idTayangan = $(this).data('id');
+
+            $.ajax({
+                type: 'POST',
+                data: {
+                    'id_tayangan': idTayangan,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    // Jika penghapusan berhasil, tampilkan modal berhasil hapus
+                    $('#modalBerhasilHapus').modal('show');
+                    // Refresh halaman setelah berhasil menghapus tayangan
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    // Jika terjadi kesalahan, tampilkan modal gagal hapus
+                    $('#modalGagalHapus').modal('show');
+                    console.error(xhr.responseText);
+                }
+            });
         });
     });
-
-    // Fungsi hapus row tabel
-    function hapusData(row) {
-        // Mengambil data yang diperlukan dari baris tabel
-        let idTayangan = row.getAttribute("data-id-tayangan");
-        let username = row.getAttribute("data-username");
-        let timestamp = row.getAttribute("data-timestamp");
-
-        // Cek apakah sudah lebih dari 1 hari sejak unduhan
-        let unduhTime = new Date(timestamp);
-        let now = new Date();
-        let diffTime = now - unduhTime;
-        let diffDays = diffTime / (1000 * 3600 * 24);
-
-        if (diffDays < 1) {
-            // Jika belum 1 hari, tampilkan modal gagal
-            var modal = new bootstrap.Modal(document.getElementById('modalGagalHapus'));
-            modal.show();
-            return;
-        }
-
-        // Permintaan ke backend untuk hapus data
-        fetch(`/hapus-tayangan?id_tayangan=${idTayangan}&username=${username}`, {
-            method: "DELETE"
-        })
-            .then(response => {
-                // Periksa status respon
-                if (response.ok) {
-                    // Setelah beberapa detik, row dihapus
-                    setTimeout(() => {
-                        row.remove();
-                        // Jika penghapusan berhasil, tampilkan modal sukses
-                        var modal = new bootstrap.Modal(document.getElementById('modalBerhasilHapus'));
-                        modal.show();
-                    }, 3000);
-                } else {
-                    // Jika penghapusan gagal, muncul pesan gagal di modal
-                    var modal = new bootstrap.Modal(document.getElementById('modalGagalHapus'));
-                    modal.show();
-                }
-            })
-            .catch(error => {
-                // Jika error, muncul pesan gagal di modal
-                var modal = new bootstrap.Modal(document.getElementById('modalGagalHapus'));
-                modal.show();
-                console.error("Error:", error);
-            });
-    }
-</script>
+</script> -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
