@@ -28,7 +28,11 @@
 
         <!-- Informasi Series -->
         <div class="mb-3">
-            <p>Total View: NOT YET</p>
+            {% if viewers %}
+            <p>Total View: {{ viewers.1 }}</p>
+            {% else %}
+            <p>Total View: 0</p>
+            {% endif %}
             <p>Rating Rata-Rata: {{ avgRating.0 }} / 5.0</p>
             <p>Sinopsis: {{ dataSeries.1 }}</p>
             <p>Genre:</p>

@@ -50,18 +50,23 @@
                     <th>Tayangan</th>
                 </tr>
             </thead>
+            {% for row in rowsTop10 %}
             <tbody>
-                <!-- Data tayangan terbaik -->
                 <tr>
-                    <td>1</td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><data></td>
-                    <td><button type="button" class="btn btn-primary">Halaman Tayangan</button></td>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{row.1}}</td>
+                    <td>{{row.2}}</td>
+                    <td>{{row.3}}</td>
+                    <td>{{row.4}}</td>
+                    <td>{{row.5}}</td>
+                    <td>
+                        {% if paketAktif %}
+                            <a href="{% url 'tayangan:show_film' row.0 %}"><button type="button" class="btn btn-primary">Halaman Tayangan</button></a>
+                        {% endif %}
+                    </td>
                 </tr>
             </tbody>
+            {% endfor %}
         </table>
 
         <!-- Kategori: Film -->

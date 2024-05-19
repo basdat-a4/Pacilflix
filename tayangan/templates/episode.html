@@ -18,7 +18,7 @@
         <input type="range" class="form-range" min="0" max="100" id="durasi">
         <!-- Tombol Aksi -->
         <div class="mb-3">
-            <button type="button" class="btn btn-primary">Tonton</button>
+            <button type="button" class="btn btn-primary" id="tontonButton">Tonton</button>
         </div>
 
         <!-- Informasi Episode -->
@@ -38,4 +38,26 @@
         {% endfor %}
     </div>
 </body>
+
+<script>
+    document.getElementById('tontonButton').addEventListener('click', function () {
+        var durasi = document.getElementById('durasi').value;
+        var id_tayangan = "{{ id }}";  // Mengambil ID tayangan dari konteks
+
+        fetch("{% url 'tayangan:tonton' %}?id=" + "{{ id }}" + "&durasi=" + durasi + "&subjudul=" + "{{ subjudul }}", {
+            method: 'POST',
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Durasi tayangan berhasil disimpan!');
+            } else {
+                throw new Error('Error in saving watch duration');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error in saving watch duration');
+        });
+    });
+</script>
 {% endblock content %}
