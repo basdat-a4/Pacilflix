@@ -81,7 +81,7 @@ def hapus_unduhan(request, id_tayangan, timestamp):
                         WHERE id_tayangan = %s AND username = %s AND timestamp = %s
                         """, [id_tayangan, username, new_timestamp])
                 connection.commit()
-            return redirect('/save/unduhan/')
+            return redirect('/save/unduhan')
         except DatabaseError as e:
             if 'Tayangan tidak dapat dihapus karena belum terunduh selama lebih dari 1 hari' in str(e):
                 return render(request, 'daftar_unduhan.html', {
