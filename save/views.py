@@ -1,7 +1,7 @@
 from datetime import datetime
 from pyexpat.errors import messages
 from django.shortcuts import render, redirect
-from django.db import connection
+from django.db import connection, DatabaseError
 
 def daftar_unduhan(request):
         username = request.COOKIES["username"]
@@ -21,6 +21,7 @@ def daftar_unduhan(request):
                 ],
             }
         return render(request, 'daftar_unduhan.html', context)
+
 
 def daftar_favorit(request):
         username = request.COOKIES["username"]
@@ -67,31 +68,47 @@ def detail_favorit(request, judul):
             }
         return render(request, 'detail_favorit.html', context)
 
-# def hapus_unduhan(request):
-#     if request.method == 'POST':
-#         id_tayangan = request.GET.get('id_tayangan')
-#         username = request.COOKIES.get('username')
-#         with connection.cursor() as cursor:
-#             cursor.execute("SET search_path TO Pacilflix;")
-#             cursor.execute("""DELETE FROM TAYANGAN_TERUNDUH
-#                            WHERE id_tayangan = %s
-#                            AND username = %s""", [id_tayangan, username])
-#         # Setelah berhasil, arahkan kembali ke halaman daftar unduhan
-#         return redirect('save:detail_favorit')
 
 def hapus_unduhan(request, id_tayangan, timestamp):
     if request.method == 'POST':
         username = request.COOKIES["username"]
         new_timestamp = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S")
-        with connection.cursor() as cursor:
-            cursor.execute("SET search_path TO Pacilflix;")
-            cursor.execute("""
-                    DELETE FROM TAYANGAN_TERUNDUH
-                    WHERE id_tayangan = %s AND username = %s AND timestamp = %s
-                    """, [id_tayangan, username, new_timestamp])
-            connection.commit()
-        return redirect('/save/unduhan/')
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SET search_path TO Pacilflix;")
+                cursor.execute("""
+                        DELETE FROM TAYANGAN_TERUNDUH
+                        WHERE id_tayangan = %s AND username = %s AND timestamp = %s
+                        """, [id_tayangan, username, new_timestamp])
+                connection.commit()
+            return redirect('/save/unduhan/')
+        except DatabaseError as e:
+            if 'Tayangan tidak dapat dihapus karena belum terunduh selama lebih dari 1 hari' in str(e):
+                return render(request, 'daftar_unduhan.html', {
+                    'error_message': 'Tayangan minimal harus berada di daftar unduhan selama 1 hari agar bisa dihapus.',
+                    'unduhan_list': get_unduhan_list(username)  # Fetch the updated list to render the page
+                })
+            else:
+                # For other database errors
+                return render(request, 'daftar_unduhan.html', {
+                    'error_message': 'Terjadi kesalahan saat menghapus tayangan.',
+                    'unduhan_list': get_unduhan_list(username) 
+                })
     
+
+def get_unduhan_list(username):
+    # Fetch the list of unduhan for the user
+    with connection.cursor() as cursor:
+        cursor.execute("SET search_path TO Pacilflix;")
+        cursor.execute("""
+            SELECT T.judul, TU.timestamp, TU.id_tayangan
+            FROM TAYANGAN_TERUNDUH TU
+            JOIN TAYANGAN T ON TU.id_tayangan = T.id
+            WHERE TU.username = %s
+        """, [username])
+        return cursor.fetchall()
+    
+
 def hapus_favorit(request, timestamp):
     if request.method == 'POST':
         username = request.COOKIES["username"]
@@ -107,6 +124,7 @@ def hapus_favorit(request, timestamp):
                     """, [username, new_timestamp])
             connection.commit()
         return redirect('/save/favorit')
+
 
 def hapus_tayangan(request, id_tayangan, timestamp):
     if request.method == 'POST':
@@ -130,4 +148,3 @@ def hapus_tayangan(request, id_tayangan, timestamp):
                     cursor.close()
                     connection.close()
         return redirect('save:daftar_favorit')
-

@@ -31,53 +31,6 @@
     </table>
 </div>
 
-<!-- <script>
-    $(document).on('click', '.hapus-data', function () {
-        var judul_tayangan = $(this).closest('tr').find('td:first').text();
-
-        $.ajax({
-            type: 'POST',
-            data: {
-                'id_tayangan': id_tayangan,
-                'csrfmiddlewaretoken': csrf_token
-            },
-            success: function (response) {
-                // Refresh halaman setelah berhasil menghapus tayangan
-                location.reload();
-            },
-            error: function (xhr, status, error) {
-                console.error(xhr.responseText);
-            }
-        });
-    });
-</script> -->
-
-<!-- 
-<script>
-    function hapusTayangan(tayanganId, favoritId) {
-        fetch(`/hapus-tayangan-favorit/${tayanganId}/?favorit_id=${favoritId}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Gagal menghapus tayangan dari favorit');
-                }
-            });
-    }
-</script> -->
-
-<script>
-    var csrf_token = '{{ csrf_token }}'; 
-</script>
-
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>

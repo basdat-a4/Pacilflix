@@ -206,9 +206,58 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- CEK HAPUS UNDUHAN
 CREATE TRIGGER before_delete_unduhan BEFORE DELETE ON TAYANGAN_TERUNDUH FOR EACH ROW
 EXECUTE FUNCTION cek_unduhan_before_delete ();
+
+-- CEK USERNAME ADA/TIDAK
+CREATE OR REPLACE FUNCTION check_exist_username()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Mengecek apakah username sudah ada di tabel PENGGUNA
+    IF EXISTS (SELECT 1 FROM PENGGUNA WHERE username = NEW.username) THEN
+        RAISE EXCEPTION 'Username % sudah terdaftar.', NEW.username;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_exist_username
+BEFORE INSERT ON PENGGUNA
+FOR EACH ROW
+EXECUTE FUNCTION check_exist_username();
+
+-- CEK PAKET ADA/TIDAK
+CREATE OR REPLACE FUNCTION check_paket_exist() RETURNS TRIGGER AS 
+$$
+	DECLARE
+		paket_exist BOOLEAN;
+	BEGIN 
+		SELECT EXISTS(
+			SELECT 1
+			FROM TRANSACTION
+			WHERE username = NEW.username AND NEW.start_date_time BETWEEN start_date_time AND end_date_time
+		) INTO paket_exist;
+
+		IF paket_exist THEN
+			UPDATE TRANSACTION
+			SET start_date_time = NEW.start_date_time,
+				end_date_time = NEW.end_date_time,
+				nama_paket = NEW.nama_paket,
+				metode_pembayaran = NEW.metode_pembayaran,
+				timestamp_pembayaran = NEW.timestamp_pembayaran
+			WHERE username = NEW.username AND start_date_time = NEW.start_date_time;
+			RETURN NULL;
+		ELSE
+			RETURN NEW;
+		END IF;
+	END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER beli_paket
+BEFORE INSERT ON TRANSACTION
+FOR EACH ROW
+EXECUTE FUNCTION check_paket_exist();
 
 INSERT INTO
     PAKET

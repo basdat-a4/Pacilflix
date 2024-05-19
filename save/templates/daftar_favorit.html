@@ -3,32 +3,6 @@
 
 {% include "navbar-user.html" %}
 
-<!-- Modal Tambah Favorit -->
-<!-- <div class="modal fade" id="modalTambahFavorit" tabindex="-1" aria-labelledby="modalTambahFavoritLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTambahFavoritLabel">TAMBAH KE DAFTAR FAVORIT</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body"> -->
-
-<!-- Form memilih daftar favorit -->
-<!-- <label for="dropdownDaftarFavorit" class="form-label">Judul Daftar Favorit:</label>
-                <select class="form-select" aria-label="Daftar Favorit" id="dropdownDaftarFavorit">
-                    <option value="1">Judul Favorit 1</option>
-                    <option value="2">Judul Favorit 2</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-primary" id="btnTambahFavorit">Tambah</button>
-            </div>
-        </div>
-    </div>
-</div> -->
-
 <!-- Tabel Daftar Favorit -->
 <div class="container mt-4">
     <h1 class="text-center fw-bold">Daftar Favorit</h1>
@@ -56,31 +30,6 @@
         </tbody>
     </table>
 </div>
-
-<!-- <div class="fav-tayangan">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahFavorit">
-        Tambah
-    </button>
-</div> -->
-
-<!-- <script>
-    function hapusFavorit(favoritId) {
-        fetch(`/hapus-favorit/${favoritId}/`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Gagal menghapus favorit');
-                }
-            });
-    }
-</script> -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

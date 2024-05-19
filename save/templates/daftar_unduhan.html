@@ -8,7 +8,9 @@
     <h1 class="text-center fw-bold">DAFTAR UNDUHAN</h1>
     <div id="daftar-unduhan" class="mt-5">
         {% if error_message %}
-        <p>Error: {{ error_message }}</p>
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
         {% endif %}
         {% if unduhan_list %}
         <table class="table">
@@ -51,26 +53,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Tayangan minimal harus berada di daftar unduhan selama 1 hari agar bisa dihapus.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Berhasil Hapus -->
-<div class="modal fade" id="modalBerhasilHapus" tabindex="-1" aria-labelledby="modalBerhasilHapusLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalBerhasilHapusLabel">BERHASIL MENGHAPUS TAYANGAN</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Tayangan berhasil dihapus.</p>
+                <p id="modalGagalHapusText">{{ error_message }}</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -80,32 +63,12 @@
 </div>
 
 
-<!-- <script>
-    $(document).ready(function () {
-        $('.hapus-data').click(function () {
-            var idTayangan = $(this).data('id');
-
-            $.ajax({
-                type: 'POST',
-                data: {
-                    'id_tayangan': idTayangan,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                },
-                success: function (response) {
-                    // Jika penghapusan berhasil, tampilkan modal berhasil hapus
-                    $('#modalBerhasilHapus').modal('show');
-                    // Refresh halaman setelah berhasil menghapus tayangan
-                    location.reload();
-                },
-                error: function (xhr, status, error) {
-                    // Jika terjadi kesalahan, tampilkan modal gagal hapus
-                    $('#modalGagalHapus').modal('show');
-                    console.error(xhr.responseText);
-                }
-            });
-        });
-    });
-</script> -->
+{% if error_message %}
+<script>
+    let modalGagalHapus = new bootstrap.Modal(document.getElementById('modalGagalHapus'), {});
+    modalGagalHapus.show();
+</script>
+{% endif %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
