@@ -61,7 +61,11 @@
                     <td>{{row.5}}</td>
                     <td>
                         {% if paketAktif %}
+                            {% if row.6 == 'Film' %}
                             <a href="{% url 'tayangan:show_film' row.0 %}"><button type="button" class="btn btn-primary">Halaman Tayangan</button></a>
+                            {% elif row.6 == 'Series' %}
+                            <a href="{% url 'tayangan:show_series' row.0 %}"><button type="button" class="btn btn-primary">Halaman Tayangan</button></a>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>
