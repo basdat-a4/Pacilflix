@@ -28,11 +28,11 @@ def show_trailer(request):
                         FROM viewer_count
                     )
                     SELECT
-                    t.id as id,  
-                    t.judul AS title, 
-                    t.sinopsis_trailer AS synopsis, 
-                    t.url_video_trailer AS url,
-                    t.release_date_trailer AS release_date,
+                    t.id,  
+                    t.judul, 
+                    t.sinopsis_trailer, 
+                    t.url_video_trailer,
+                    t.release_date_trailer,
                     COALESCE(total_view, 0) as total_view,
                     CASE WHEN rv.total_view = 0 THEN ROW_NUMBER() OVER (ORDER BY t.judul)
                         ELSE rv.rank
@@ -100,12 +100,17 @@ def show_tayangan(request):
                         FROM viewer_count
                     )
                     SELECT
-                    t.id as id,  
-                    t.judul AS title, 
-                    t.sinopsis_trailer AS synopsis, 
-                    t.url_video_trailer AS url,
-                    t.release_date_trailer AS release_date,
+                    t.id,  
+                    t.judul, 
+                    t.sinopsis_trailer, 
+                    t.url_video_trailer,
+                    t.release_date_trailer,
                     COALESCE(total_view, 0) as total_view,
+                    CASE 
+                        WHEN EXISTS (SELECT 1 FROM FILM f WHERE f.id_tayangan = t.id) THEN 'Film'
+                        WHEN EXISTS (SELECT 1 FROM SERIES s WHERE s.id_tayangan = t.id) THEN 'Series'
+                        ELSE 'Unknown'
+                    END AS type,
                     CASE WHEN rv.total_view = 0 THEN ROW_NUMBER() OVER (ORDER BY t.judul)
                         ELSE rv.rank
                     END AS rank
@@ -164,6 +169,7 @@ def show_tayangan(request):
     return render(request, "tayangan.html", context)
 
 def show_film(request, id):
+    user = request.COOKIES['username']
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
 
@@ -233,6 +239,21 @@ def show_film(request, id):
                     """, [str(id)])
     viewers = cursor.fetchone()
 
+    cursor.execute("""
+                    SELECT f.id_tayangan 
+                    FROM FILM f
+                    WHERE %s = f.id_tayangan 
+                        AND f.release_date_film <= CURRENT_DATE;
+                    """, [str(id)])
+    isRelease = cursor.fetchall()
+
+    cursor.execute("""
+                    SELECT df.timestamp, df.judul
+                    FROM DAFTAR_FAVORIT AS df
+                    WHERE %s = df.username;
+                    """, [str(user)])
+    daftarFavorit = cursor.fetchall()
+
     context = {
         'username': request.COOKIES.get('username'),
         "id" : id,
@@ -243,11 +264,14 @@ def show_film(request, id):
         "sutradara": sutradara,
         "ulasan": ulasan,
         "dataFilm": dataFilm,
-        "viewers": viewers
+        "viewers": viewers,
+        "isRelease": isRelease,
+        "daftarFavorit": daftarFavorit
     }
     return render(request, "film.html", context)
 
 def show_series(request, id):
+    user = request.COOKIES['username']
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
 
@@ -331,6 +355,13 @@ def show_series(request, id):
                     """, [str(id)])
     viewers = cursor.fetchone()
 
+    cursor.execute("""
+                    SELECT df.timestamp, df.judul
+                    FROM DAFTAR_FAVORIT AS df
+                    WHERE %s = df.username;
+                    """, [str(user)])
+    daftarFavorit = cursor.fetchall()
+
     context = {
         'username': request.COOKIES.get('username'),
         "id" : id,
@@ -342,7 +373,8 @@ def show_series(request, id):
         "ulasan": ulasan,
         "dataSeries": dataSeries,
         "episode": episode,
-        "viewers": viewers
+        "viewers": viewers,
+        "daftarFavorit": daftarFavorit
     }
     return render(request, "series.html", context)
 
@@ -371,13 +403,22 @@ def show_episode(request, id, subjudul):
                 """, [id, subjudul])
     episode = cursor.fetchall()
 
+    cursor.execute("""
+                    SELECT e.id_series
+                    FROM EPISODE e
+                    WHERE %s = e.id_series AND %s = e.sub_judul 
+                        AND f.release_date_film <= CURRENT_DATE;
+                    """, [str(id), str(subjudul)])
+    isRelease = cursor.fetchall()
+
     context = {
         'username': request.COOKIES.get('username'),
         "id" : id,
         "subjudul" : subjudul,
         "dataEpisode": dataEpisode,
         "judul" : judul,
-        "episode": episode
+        "episode": episode,
+        "isRelease": isRelease
     }
     return render(request, "episode.html", context)
 
@@ -553,5 +594,44 @@ def tonton(request):
     cursor.execute("""
                     INSERT INTO RIWAYAT_NONTON VALUES (%s, %s, %s, %s);
                     """, [id, username, timestampNow, timestampAfter])
+    
+    return JsonResponse({'status': 'success'})
+
+@csrf_exempt
+def favorit(request):
+    id = request.GET.get('id')
+    # timestampStr = request.GET.get('timestamp')
+    # timestamp = timestampStr.replace('a.m.', 'am').replace('p.m.', 'pm')
+
+    timestampStr = request.GET.get('timestamp')
+
+    # Ubah format "pm" dan "am" agar sesuai dengan format yang diharapkan
+    timestampStr = timestampStr.replace('a.m.', 'am').replace('p.m.', 'pm')
+
+    # Coba format tanggal untuk format pertama
+    try:
+        timestampPre = datetime.strptime(timestampStr, "%b. %d, %Y, %I:%M %p")
+    except ValueError:
+        # Jika format pertama gagal, coba format kedua
+        try:
+            timestampPre = datetime.strptime(timestampStr, "%B %d, %Y, %I:%M %p")
+        except ValueError:
+            # Jika kedua format gagal, lemparkan ValueError
+            raise ValueError("Invalid date format")
+
+    # # Hapus titik setelah nama bulan
+    # timestampStr = timestampStr.replace(".", "")
+
+    # Format the datetime object as needed (optional)
+    # timestamp = timestampPre.strftime("%Y-%m-%d %H:%M:%S")
+
+    username = request.COOKIES.get('username')
+
+    cursor = connection.cursor()
+    cursor.execute("SET search_path TO pacilflix;")
+
+    cursor.execute("""
+                    INSERT INTO TAYANGAN_MEMILIKI_DAFTAR_FAVORIT VALUES (%s, %s, %s);
+                    """, [id, timestampPre, username])
     
     return JsonResponse({'status': 'success'})

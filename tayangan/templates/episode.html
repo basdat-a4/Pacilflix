@@ -18,7 +18,9 @@
         <input type="range" class="form-range" min="0" max="100" id="durasi">
         <!-- Tombol Aksi -->
         <div class="mb-3">
+            {% if isRelease %}
             <button type="button" class="btn btn-primary" id="tontonButton">Tonton</button>
+            {% endif %}
         </div>
 
         <!-- Informasi Episode -->

@@ -23,7 +23,7 @@
         <!-- Tombol Aksi -->
         <div class="mb-3">
             <button type="button" class="btn btn-primary">Unduh Tayangan</button>
-            <button type="button" class="btn btn-primary">Favorit Tayangan</button>
+            <button type="button" class="btn btn-primary" id="favoritButton" data-bs-toggle="modal" data-bs-target="#modalTambahFavorit">Favorit Tayangan</button>
         </div>
 
         <!-- Informasi Series -->
@@ -94,9 +94,56 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Tambah Favorit -->
+    <!-- copas from save modul -->
+    <div class="modal fade" id="modalTambahFavorit" tabindex="-1" aria-labelledby="modalTambahFavoritLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTambahFavoritLabel">TAMBAH KE DAFTAR FAVORIT</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form memilih daftar favorit -->
+                <label for="dropdownDaftarFavorit" class="form-label">Judul Daftar Favorit:</label>
+                <select class="form-select" aria-label="Daftar Favorit" id="dropdownDaftarFavorit">
+                    {% for row in daftarFavorit %}
+                        <option value="{{ row.0 }}">{{ row.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="btnTambahFavorit">Tambah</button>
+            </div>
+        </div>
+    </div>
+    </div>
 </body>
 
 <script>
+    document.getElementById('btnTambahFavorit').addEventListener('click', function () {
+        var timestamp = document.getElementById('dropdownDaftarFavorit').value;
+
+        // Kirim data ke view Django untuk menambahkan tayangan ke daftar favorit
+        fetch("{% url 'tayangan:favorit' %}?id=" + "{{ id }}" + "&timestamp=" + timestamp + "&username=" + "{{ username }}", {
+            method: 'POST',
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Tayangan berhasil ditambahkan ke daftar favorit!');
+            } else {
+                throw new Error('Error in adding the movie to the favorites list');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error in adding the movie to the favorites list');
+        });
+    });
+
     document.getElementById('submitReviewButton').addEventListener('click', function () {
         var reviewDescription = document.getElementById('reviewDescriptionInput').value;
         var reviewRating = document.getElementById('reviewRatingInput').value;
