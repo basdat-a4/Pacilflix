@@ -271,6 +271,7 @@ def show_film(request, id):
     return render(request, "film.html", context)
 
 def show_series(request, id):
+    user = request.COOKIES['username']
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
 
@@ -354,6 +355,13 @@ def show_series(request, id):
                     """, [str(id)])
     viewers = cursor.fetchone()
 
+    cursor.execute("""
+                    SELECT df.timestamp, df.judul
+                    FROM DAFTAR_FAVORIT AS df
+                    WHERE %s = df.username;
+                    """, [str(user)])
+    daftarFavorit = cursor.fetchall()
+
     context = {
         'username': request.COOKIES.get('username'),
         "id" : id,
@@ -365,7 +373,8 @@ def show_series(request, id):
         "ulasan": ulasan,
         "dataSeries": dataSeries,
         "episode": episode,
-        "viewers": viewers
+        "viewers": viewers,
+        "daftarFavorit": daftarFavorit
     }
     return render(request, "series.html", context)
 
@@ -623,6 +632,6 @@ def favorit(request):
 
     cursor.execute("""
                     INSERT INTO TAYANGAN_MEMILIKI_DAFTAR_FAVORIT VALUES (%s, %s, %s);
-                    """, [id, timestamp, username])
+                    """, [id, timestampPre, username])
     
     return JsonResponse({'status': 'success'})
