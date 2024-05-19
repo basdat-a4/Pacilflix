@@ -6,7 +6,6 @@ from django.db import connection
 from authentication.views import login_required_custom
 from django.views.decorators.csrf import csrf_exempt
 
-@login_required_custom
 def show_trailer(request):
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
