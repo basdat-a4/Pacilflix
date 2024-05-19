@@ -6,7 +6,7 @@ from django.db import connection
 from authentication.views import login_required_custom
 from django.views.decorators.csrf import csrf_exempt
 
-# Create your views here.
+@login_required_custom
 def show_trailer(request):
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
@@ -78,6 +78,7 @@ def show_trailer(request):
     }
     return render(request, "trailer.html", context)
 
+@login_required_custom
 def show_tayangan(request):
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
@@ -168,6 +169,7 @@ def show_tayangan(request):
     }
     return render(request, "tayangan.html", context)
 
+@login_required_custom
 def show_film(request, id):
     user = request.COOKIES['username']
     cursor = connection.cursor()
@@ -270,6 +272,7 @@ def show_film(request, id):
     }
     return render(request, "film.html", context)
 
+@login_required_custom
 def show_series(request, id):
     user = request.COOKIES['username']
     cursor = connection.cursor()
@@ -378,6 +381,7 @@ def show_series(request, id):
     }
     return render(request, "series.html", context)
 
+@login_required_custom
 def show_episode(request, id, subjudul):
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
@@ -421,6 +425,7 @@ def show_episode(request, id, subjudul):
         "isRelease": isRelease
     }
     return render(request, "episode.html", context)
+
 
 def search_tayangan(request):
     if request.method == 'GET' and 'searchInput' in request.GET:
