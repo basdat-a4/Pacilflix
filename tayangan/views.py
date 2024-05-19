@@ -159,6 +159,10 @@ def show_tayangan(request):
                         AND t.end_date_time >= CURRENT_DATE;
                     """, [user])
     paketAktif = cursor.fetchall()
+    if len(paketAktif) > 0:
+        paketAktif = True
+    else:
+        paketAktif = False
 
     context = {
         "rowsSeries": rowsSeries,
@@ -425,7 +429,6 @@ def show_episode(request, id, subjudul):
         "isRelease": isRelease
     }
     return render(request, "episode.html", context)
-
 
 def search_tayangan(request):
     if request.method == 'GET' and 'searchInput' in request.GET:
