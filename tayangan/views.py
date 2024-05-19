@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+import math
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.db import connection
@@ -10,42 +11,35 @@ def show_trailer(request):
     cursor = connection.cursor()
     cursor.execute("SET search_path TO pacilflix;")
     cursor.execute(""" 
-                    WITH durasi_tayangan AS (
-                        SELECT
-                            id_series AS id_tayangan,
-                            SUM(durasi) AS total_durasi
-                        FROM
-                            EPISODE
-                        GROUP BY
-                            id_series
+                    WITH viewer_count AS (
+                        SELECT rn.id_tayangan,
+                            COUNT(*) AS total_view
+                        FROM RIWAYAT_NONTON AS rn
+                        LEFT JOIN FILM AS f ON rn.id_tayangan = f.id_tayangan
+                        LEFT JOIN EPISODE AS e ON rn.id_tayangan = e.id_series
+                        WHERE rn.end_date_time >= NOW() - INTERVAL '7 days'
+                        AND EXTRACT(EPOCH FROM (rn.end_date_time - rn.start_date_time)) / 60 >= 0.7 * COALESCE(f.durasi_film, e.durasi)
+                        GROUP BY rn.id_tayangan
                     ),
-                    total_viewers AS (
-                        SELECT
-                            id_tayangan,
-                            COUNT(*) AS total_viewer
-                        FROM
-                            RIWAYAT_NONTON rn
-                        WHERE
-                            start_date_time >= CURRENT_DATE - INTERVAL '7 days'
-                        GROUP BY
-                            id_tayangan
+                    ranked_viewers AS (
+                        SELECT id_tayangan,
+                            COALESCE(total_view, 0) AS total_view,
+                            ROW_NUMBER() OVER (ORDER BY COALESCE(total_view, 0) DESC) AS rank
+                        FROM viewer_count
                     )
                     SELECT
-                        ROW_NUMBER() OVER (ORDER BY COALESCE(tv.total_viewer, 0) DESC, t.judul) AS peringkat,
-                        t.judul,
-                        t.sinopsis_trailer,
-                        t.url_video_trailer,
-                        t.release_date_trailer,
-                        COALESCE(tv.total_viewer, 0) AS total_view_7_hari_terakhir
-                    FROM
-                        TAYANGAN t
-                    LEFT JOIN
-                        total_viewers tv ON t.id = tv.id_tayangan
-                    WHERE
-                        t.id IN (SELECT id_tayangan FROM durasi_tayangan WHERE total_durasi > 0)
-                    ORDER BY
-                        total_view_7_hari_terakhir DESC,
-                        t.judul
+                    t.id as id,  
+                    t.judul AS title, 
+                    t.sinopsis_trailer AS synopsis, 
+                    t.url_video_trailer AS url,
+                    t.release_date_trailer AS release_date,
+                    COALESCE(total_view, 0) as total_view,
+                    CASE WHEN rv.total_view = 0 THEN ROW_NUMBER() OVER (ORDER BY t.judul)
+                        ELSE rv.rank
+                    END AS rank
+                    FROM TAYANGAN AS t 
+                    LEFT JOIN ranked_viewers AS rv ON t.id = rv.id_tayangan
+                    ORDER BY rank
                     LIMIT 10;
                    """)
     rowsTop10 = cursor.fetchall()
@@ -89,42 +83,35 @@ def show_tayangan(request):
     cursor.execute("SET search_path TO pacilflix;")
 
     cursor.execute(""" 
-                    WITH durasi_tayangan AS (
-                        SELECT
-                            id_series AS id_tayangan,
-                            SUM(durasi) AS total_durasi
-                        FROM
-                            EPISODE
-                        GROUP BY
-                            id_series
+                    WITH viewer_count AS (
+                        SELECT rn.id_tayangan,
+                            COUNT(*) AS total_view
+                        FROM RIWAYAT_NONTON AS rn
+                        LEFT JOIN FILM AS f ON rn.id_tayangan = f.id_tayangan
+                        LEFT JOIN EPISODE AS e ON rn.id_tayangan = e.id_series
+                        WHERE rn.end_date_time >= NOW() - INTERVAL '7 days'
+                        AND EXTRACT(EPOCH FROM (rn.end_date_time - rn.start_date_time)) / 60 >= 0.7 * COALESCE(f.durasi_film, e.durasi)
+                        GROUP BY rn.id_tayangan
                     ),
-                    total_viewers AS (
-                        SELECT
-                            id_tayangan,
-                            COUNT(*) AS total_viewer
-                        FROM
-                            RIWAYAT_NONTON rn
-                        WHERE
-                            start_date_time >= CURRENT_DATE - INTERVAL '7 days'
-                        GROUP BY
-                            id_tayangan
+                    ranked_viewers AS (
+                        SELECT id_tayangan,
+                            COALESCE(total_view, 0) AS total_view,
+                            ROW_NUMBER() OVER (ORDER BY COALESCE(total_view, 0) DESC) AS rank
+                        FROM viewer_count
                     )
                     SELECT
-                        ROW_NUMBER() OVER (ORDER BY COALESCE(tv.total_viewer, 0) DESC, t.judul) AS peringkat,
-                        t.judul,
-                        t.sinopsis_trailer,
-                        t.url_video_trailer,
-                        t.release_date_trailer,
-                        COALESCE(tv.total_viewer, 0) AS total_view_7_hari_terakhir
-                    FROM
-                        TAYANGAN t
-                    LEFT JOIN
-                        total_viewers tv ON t.id = tv.id_tayangan
-                    WHERE
-                        t.id IN (SELECT id_tayangan FROM durasi_tayangan WHERE total_durasi > 0)
-                    ORDER BY
-                        total_view_7_hari_terakhir DESC,
-                        t.judul
+                    t.id as id,  
+                    t.judul AS title, 
+                    t.sinopsis_trailer AS synopsis, 
+                    t.url_video_trailer AS url,
+                    t.release_date_trailer AS release_date,
+                    COALESCE(total_view, 0) as total_view,
+                    CASE WHEN rv.total_view = 0 THEN ROW_NUMBER() OVER (ORDER BY t.judul)
+                        ELSE rv.rank
+                    END AS rank
+                    FROM TAYANGAN AS t 
+                    LEFT JOIN ranked_viewers AS rv ON t.id = rv.id_tayangan
+                    ORDER BY rank
                     LIMIT 10;
                    """)
     rowsTop10 = cursor.fetchall()
@@ -234,6 +221,18 @@ def show_film(request, id):
                 """, [id])
     ulasan = cursor.fetchall()
 
+    cursor.execute("""
+                    SELECT rn.id_tayangan,
+                    COUNT(*) AS total_view
+                    FROM RIWAYAT_NONTON AS rn
+                    LEFT JOIN FILM AS f ON rn.id_tayangan = f.id_tayangan
+                    JOIN TAYANGAN AS t ON rn.id_tayangan = t.id
+                    WHERE t.id = %s
+                    AND EXTRACT(EPOCH FROM (rn.end_date_time - rn.start_date_time)) / 60 >= 0.7 * COALESCE(f.durasi_film, 0)
+                    GROUP BY rn.id_tayangan;
+                    """, [str(id)])
+    viewers = cursor.fetchone()
+
     context = {
         'username': request.COOKIES.get('username'),
         "id" : id,
@@ -243,7 +242,8 @@ def show_film(request, id):
         "penulis": penulis,
         "sutradara": sutradara,
         "ulasan": ulasan,
-        "dataFilm": dataFilm
+        "dataFilm": dataFilm,
+        "viewers": viewers
     }
     return render(request, "film.html", context)
 
@@ -312,6 +312,25 @@ def show_series(request, id):
                 """, [id])
     episode = cursor.fetchall()
 
+    cursor.execute("""
+                    WITH episode_durations AS (
+                    SELECT id_series,
+                    SUM(durasi) AS total_durasi
+                    FROM EPISODE
+                    GROUP BY id_series
+                    )
+                    SELECT rn.id_tayangan,
+                    COUNT(*) AS total_view
+                    FROM RIWAYAT_NONTON AS rn
+                    LEFT JOIN FILM AS f ON rn.id_tayangan = f.id_tayangan
+                    LEFT JOIN episode_durations AS ed ON rn.id_tayangan = ed.id_series
+                    JOIN TAYANGAN AS t ON rn.id_tayangan = t.id
+                    WHERE t.id = %s
+                    AND EXTRACT(EPOCH FROM (rn.end_date_time - rn.start_date_time)) / 60 >= 0.7 * COALESCE(f.durasi_film, ed.total_durasi)
+                    GROUP BY rn.id_tayangan
+                    """, [str(id)])
+    viewers = cursor.fetchone()
+
     context = {
         'username': request.COOKIES.get('username'),
         "id" : id,
@@ -322,7 +341,8 @@ def show_series(request, id):
         "sutradara": sutradara,
         "ulasan": ulasan,
         "dataSeries": dataSeries,
-        "episode": episode
+        "episode": episode,
+        "viewers": viewers
     }
     return render(request, "series.html", context)
 
@@ -497,4 +517,41 @@ def tambah_unduhan(request):
     INSERT INTO TAYANGAN_TERUNDUH VALUES (%s, %s, %s);
                 """, [id, username, timestamp])
     return JsonResponse({'status': 'success'})
+
+@csrf_exempt
+def tonton(request):
+    id = request.GET.get('id')
+    durasi = request.GET.get('durasi')
+    username = request.COOKIES.get('username')
+    subjudul = request.GET.get('subjudul')
+    cursor = connection.cursor()
+    cursor.execute("SET search_path TO pacilflix;")
+
+    if subjudul=="":
+        cursor.execute("""
+            SELECT f.durasi_film 
+            FROM FILM f
+            WHERE f.id_tayangan = %s;
+        """, [str(id)])
+        film = cursor.fetchone()
+        durasiAsli = film[0]
+    else:
+        cursor.execute("""
+            SELECT e.durasi 
+            FROM EPISODE e
+            WHERE e.id_series = %s AND e.sub_judul = %s;
+        """, [str(id), str(subjudul)])
+        episode = cursor.fetchone()
+        durasiAsli = episode[0]
+
+    # Menghitung timestamp sekarang dan timestamp setelah menonton
+    timestampNow = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    durasi_nonton = (int(durasi) / 100) * durasiAsli
+    # durasi_nonton = math.ceil((int(durasi) / 100) * durasi_asli)
+    timestampAfter = (datetime.now() + timedelta(minutes=durasi_nonton)).strftime("%Y-%m-%d %H:%M:%S")
+
+    cursor.execute("""
+                    INSERT INTO RIWAYAT_NONTON VALUES (%s, %s, %s, %s);
+                    """, [id, username, timestampNow, timestampAfter])
     
+    return JsonResponse({'status': 'success'})
