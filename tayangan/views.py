@@ -415,7 +415,7 @@ def show_episode(request, id, subjudul):
                     SELECT e.id_series
                     FROM EPISODE e
                     WHERE %s = e.id_series AND %s = e.sub_judul 
-                        AND f.release_date_film <= CURRENT_DATE;
+                        AND e.release_date <= CURRENT_DATE;
                     """, [str(id), str(subjudul)])
     isRelease = cursor.fetchall()
 
