@@ -45,9 +45,7 @@ CREATE TABLE TAYANGAN (
 CREATE TABLE PENGGUNA (
     username VARCHAR(50) PRIMARY KEY,
     PASSWORD VARCHAR(50) NOT NULL,
-    id_tayangan UUID,
-    negara_asal VARCHAR(50) NOT NULL,
-    FOREIGN KEY (id_tayangan) REFERENCES TAYANGAN (id) ON UPDATE CASCADE ON DELETE CASCADE
+    negara_asal VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE DUKUNGAN_PERANGKAT (
@@ -1135,49 +1133,41 @@ INSERT INTO
 VALUES (
         'alice_johnson',
         'secret123',
-        '6f7c5e9d-4a2f-4e3b-8d2f-0e3a1d1e2b3c',
         'Indonesia'
     ),
     (
         'david_smith',
         'mypass456',
-        '3a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d',
         'USA'
     ),
     (
         'emma_wilson',
         'secure789',
-        '5d4c3b2a-1f2e-3d4c-5b6a-7c8d9e0f1a2b',
         'Canada'
     ),
     (
         'henry_clark',
         'access987',
-        '9e8d7c6b-5a4b-3c2d-1e0f-9a8b7c6d5e4f',
         'UK'
     ),
     (
         'isabella_lee',
         'pass1234',
-        '1e2d3c4b-5a6b-7c8d-9e0f-1a2b3c4d5e6f',
         'Australia'
     ),
     (
         'jackson_kim',
         'secret567',
-        '4d5e6f7a-8b9c-1d2e-3f4a-5b6c7d8e9f0a',
         'Germany'
     ),
     (
         'lily_tan',
         'mypass890',
-        '8e9f0a1b-2c3d-4e5f-6a7b-8c9d0e1f2a3b',
         'Japan'
     ),
     (
         'mason_choi',
         'secure012',
-        '3b4c5d6e-7f8a-9b0c-1d2e-3f4a5b6c7d8e',
         'Brazil'
     );
 
